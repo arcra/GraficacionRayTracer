@@ -3,7 +3,7 @@
 *	A. Joaquin Ibarra Gallardo &	*
 *	Adrián Revuelta Cuauhtli		*
 * ---------------------------------	*
-*	Proyecto 1						*
+*	Proyecto 2						*
 *************************************
 
 Sobre el proyecto
