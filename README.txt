@@ -1,6 +1,6 @@
 *************************************
 *	Pedro X. Contla Romero,			*
-*	A. Joaquin Ibarra Gallardo &	*
+*	Alejandro Joaquin Ibarra Gallardo &	*
 *	Adrián Revuelta Cuauhtli		*
 * ---------------------------------	*
 *	Proyecto 2						*
@@ -31,3 +31,5 @@ Instrucciones para ejecutar
 No requiere ningún parámetro, simplemente se invoca el archivo ejecutable resultande de la compilación.
 
 Ejecutable: bin/xcarjiProyecto1
+
+
