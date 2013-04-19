@@ -8,15 +8,15 @@ HEADERSDIR= headers
 SOURCESDIR= src
 BINDIR= bin
 
-EXCLUDED=xcarjiISurface.cpp
+ELUDED=ISurface.cpp
 
 INCLUDESDIR=$(HEADERSDIR)/
 
 HEADERS= $(wildcard $(HEADERSDIR)/*.h)
-SOURCES= $(filter-out $(addprefix $(SOURCESDIR)/,$(EXCLUDED)),$(wildcard $(SOURCESDIR)/*.cpp))
+SOURCES= $(filter-out $(addprefix $(SOURCESDIR)/,$(ELUDED)),$(wildcard $(SOURCESDIR)/*.cpp))
 
 OBJECTS = $(patsubst $(SOURCESDIR)/%.cpp, $(BINDIR)/%.o, $(SOURCES))
-EXECUTABLE=xcarjiProyecto1
+EXECUTABLE=Proyecto1
 
 all: $(SOURCES) $(EXECUTABLE)
 

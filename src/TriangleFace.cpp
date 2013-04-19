@@ -1,18 +1,19 @@
 /*
- * xcarjiTriangleFace.cpp
+ * TriangleFace.cpp
  *
  *  Created on: Apr 4, 2013
  *      Author: arcra
  */
 
-#include "xcarjiTriangleFace.h"
+#include "TriangleFace.h"
+#include "Operations.h"
 #include <iostream>
 
 using namespace std;
 
-namespace xcarjiRayTracing {
+namespace RayTracing {
 
-xcarjiTriangleFace::xcarjiTriangleFace(xcarVector v1, xcarVector v2, xcarVector v3, bool drawIt) {
+TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, bool drawIt) {
 
 	this->v1 = v1;
 	this->v2 = v2;
@@ -20,7 +21,7 @@ xcarjiTriangleFace::xcarjiTriangleFace(xcarVector v1, xcarVector v2, xcarVector 
 	this->drawable = drawIt;
 }
 
-xcarjiTriangleFace::xcarjiTriangleFace(xcarVector v1, xcarVector v2, xcarVector v3, material m, bool drawIt) {
+TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m, bool drawIt) {
 
 	this->v1 = v1;
 	this->v2 = v2;
@@ -29,13 +30,13 @@ xcarjiTriangleFace::xcarjiTriangleFace(xcarVector v1, xcarVector v2, xcarVector 
 	this->drawable = drawIt;
 }
 
-bool xcarjiTriangleFace::isSurfaceHit(ray r, float& t)
+bool TriangleFace::isSurfaceHit(ray r, float& t)
 {
-	if((r.s - r.e).dotProduct(this->computeNormal(xcarVector(0.0f, 0.0f, 0.0f))) == 0.0)
+	if((r.s - r.e).dotProduct(this->computeNormal(Vector3D(0.0f, 0.0f, 0.0f))) == 0.0)
 		return false;
 	float a,b,c,d,e,f,g,h,i;
 
-	xcarVector dir =  r.s - r.e;
+	Vector3D dir =  r.s - r.e;
 	a = v1.x - v2.x;
 	b = v1.y - v2.y;
 	c = v1.z - v2.z;
@@ -85,10 +86,17 @@ bool xcarjiTriangleFace::isSurfaceHit(ray r, float& t)
 	return true;
 }
 
-xcarVector xcarjiTriangleFace::computeNormal(xcarVector point)
+Vector3D TriangleFace::computeNormal(Vector3D point)
 {
 	normal = ((v2 - v1).crossProuct(v3 - v1)).getNormal();
 	return normal;
 }
 
-} /* namespace xcarjiRayTracing */
+void TriangleFace::applyTransformation(float** m)
+{
+	multMatrixVector3D(m, this->v1, this->v1);
+	multMatrixVector3D(m, this->v2, this->v2);
+	multMatrixVector3D(m, this->v3, this->v3);
+}
+
+} /* namespace RayTracing */

@@ -1,9 +1,9 @@
 #include <iostream>
 #include "puntos.h"
-#include "xcarjiSurfaces.h"
+#include "Surfaces.h"
 #include "math.h"
 using namespace std;
-using namespace xcarjiRayTracing;
+using namespace RayTracing;
 /*material mat1;
   material mat2;*/
 
@@ -109,11 +109,11 @@ float habitacion[8][3] = {
 float centroPisoHabitacion[1][3] = {0, 0, 0};
 */
 
-//vector<xcarSurface> getSurfaces(material mat)
-void getSurfaces(material mat, vector<xcarjiISurface*> &sur,float offsetX, float offsetY, float offsetZ)
+//vector<Surface> getSurfaces(material mat)
+void getSurfaces(material mat, vector<ISurface*> &sur,float offsetX, float offsetY, float offsetZ)
 {
 
-  //vector<xcarSurface> sur;
+  //vector<Surface> sur;
   
   for(int i = 0; i < 72 ; i = i + 8)
     {
@@ -127,18 +127,18 @@ void getSurfaces(material mat, vector<xcarjiISurface*> &sur,float offsetX, float
       |/           |/ 
       3----------- 2
       */	
-      xcarVector v1(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);        
-      xcarVector v2(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
-      xcarVector v3(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
-      //xcarSurface *s1 = new xcarSurface(v1,v2,v3,&mat,name);
-      xcarjiTriangleFace *s1 = new xcarjiTriangleFace(v1,v2,v3,mat);
+      Vector3D v1(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);        
+      Vector3D v2(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
+      Vector3D v3(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
+      //Surface *s1 = new Surface(v1,v2,v3,&mat,name);
+      TriangleFace *s1 = new TriangleFace(v1,v2,v3,mat);
       sur.push_back(s1);
       
-      xcarVector v4(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);        
-      xcarVector v5(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
-      xcarVector v6(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
-      //xcarSurface *s2 = new xcarSurface(v4,v5,v6,&mat,name);
-xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
+      Vector3D v4(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);        
+      Vector3D v5(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
+      Vector3D v6(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
+      //Surface *s2 = new Surface(v4,v5,v6,&mat,name);
+TriangleFace *s2 = new TriangleFace(v4,v5,v6,mat);
 	  sur.push_back(s2);  
 	  	  
 	  	  
@@ -152,19 +152,19 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
       |/           |/ 
       2----------- 6
       */	  	  
-      xcarVector v7(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);        
-      xcarVector v8(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
-      xcarVector v9(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
-      //xcarSurface *s3 = new xcarSurface(v7,v8,v9,&mat,name);
-      //xcarjiTriangleFace *s1 = new xcarjiTriangleFace(v1,v2,v3,mat);
-    xcarjiTriangleFace *s3 = new xcarjiTriangleFace(v7,v8,v9,mat);
+      Vector3D v7(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);        
+      Vector3D v8(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
+      Vector3D v9(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
+      //Surface *s3 = new Surface(v7,v8,v9,&mat,name);
+      //TriangleFace *s1 = new TriangleFace(v1,v2,v3,mat);
+    TriangleFace *s3 = new TriangleFace(v7,v8,v9,mat);
       sur.push_back(s3);
       
-      xcarVector v10(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);        
-      xcarVector v11(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
-      xcarVector v12(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);
-      // xcarSurface *s4 = new xcarSurface(v10,v11,v12,&mat,name);
-      xcarjiTriangleFace *s4 = new xcarjiTriangleFace(v10,v11,v12,mat);
+      Vector3D v10(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);        
+      Vector3D v11(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
+      Vector3D v12(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);
+      // Surface *s4 = new Surface(v10,v11,v12,&mat,name);
+      TriangleFace *s4 = new TriangleFace(v10,v11,v12,mat);
 	  sur.push_back(s4);  	  
 	  
 	  
@@ -178,19 +178,19 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
       |/           |/ 
       7----------- 3
       */	
-      xcarVector v13(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
-      xcarVector v14(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
-      xcarVector v15(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
-      // xcarSurface *s5 = new xcarSurface(v13,v14,v15,&mat,name);
+      Vector3D v13(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
+      Vector3D v14(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
+      Vector3D v15(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
+      // Surface *s5 = new Surface(v13,v14,v15,&mat,name);
 
-      xcarjiTriangleFace *s5 = new xcarjiTriangleFace(v13,v14,v15,mat);
+      TriangleFace *s5 = new TriangleFace(v13,v14,v15,mat);
       sur.push_back(s5);
       
-      xcarVector v16(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
-      xcarVector v17(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
-      xcarVector v18(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);
-      // xcarSurface *s6 = new xcarSurface(v16,v17,v18,&mat,name);
-      xcarjiTriangleFace *s6 = new xcarjiTriangleFace(v16,v17,v18,mat);
+      Vector3D v16(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
+      Vector3D v17(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);
+      Vector3D v18(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);
+      // Surface *s6 = new Surface(v16,v17,v18,&mat,name);
+      TriangleFace *s6 = new TriangleFace(v16,v17,v18,mat);
 	  sur.push_back(s6);  	 
 	  	       
       
@@ -204,19 +204,19 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
       |/           |/ 
       6------------7
       */	
-      xcarVector v19(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);        
-      xcarVector v20(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
-      xcarVector v21(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
-      // xcarSurface *s7 = new xcarSurface(v19,v20,v21,&mat,name);
+      Vector3D v19(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);        
+      Vector3D v20(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
+      Vector3D v21(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
+      // Surface *s7 = new Surface(v19,v20,v21,&mat,name);
       
-      xcarjiTriangleFace *s7 = new xcarjiTriangleFace(v19,v20,v21,mat);
+      TriangleFace *s7 = new TriangleFace(v19,v20,v21,mat);
       sur.push_back(s7);
       
-      xcarVector v22(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);        
-      xcarVector v23(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
-      xcarVector v24(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);
-      xcarjiTriangleFace *s8 = new xcarjiTriangleFace(v22,v23,v24,mat);
-      //  xcarSurface *s8 = new xcarSurface(v22,v23,v24,&mat,name);
+      Vector3D v22(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);        
+      Vector3D v23(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
+      Vector3D v24(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);
+      TriangleFace *s8 = new TriangleFace(v22,v23,v24,mat);
+      //  Surface *s8 = new Surface(v22,v23,v24,&mat,name);
 	  sur.push_back(s8); 
 	  
 	  
@@ -230,18 +230,18 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
       |/           |/ 
       0------------1
       */	
-      xcarVector v25(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
-      xcarVector v26(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);
-      xcarVector v27(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
-      xcarjiTriangleFace *s9 = new xcarjiTriangleFace(v25,v26,v27,mat);
-      //   xcarSurface *s9 = new xcarSurface(v25,v26,v27,&mat,name);
+      Vector3D v25(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
+      Vector3D v26(mesa[i][0]+offsetX,mesa[i][1]+offsetY,mesa[i][2]+offsetZ);
+      Vector3D v27(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
+      TriangleFace *s9 = new TriangleFace(v25,v26,v27,mat);
+      //   Surface *s9 = new Surface(v25,v26,v27,&mat,name);
       sur.push_back(s9);
       
-      xcarVector v28(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
-      xcarVector v29(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
-      xcarVector v30(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);
-      xcarjiTriangleFace *s10 = new xcarjiTriangleFace(v28,v29,v30,mat);
-      //xcarSurface *s10 = new xcarSurface(v28,v29,v30,&mat,name);
+      Vector3D v28(mesa[i+4][0]+offsetX,mesa[i+4][1]+offsetY,mesa[i+4][2]+offsetZ);        
+      Vector3D v29(mesa[i+1][0]+offsetX,mesa[i+1][1]+offsetY,mesa[i+1][2]+offsetZ);
+      Vector3D v30(mesa[i+5][0]+offsetX,mesa[i+5][1]+offsetY,mesa[i+5][2]+offsetZ);
+      TriangleFace *s10 = new TriangleFace(v28,v29,v30,mat);
+      //Surface *s10 = new Surface(v28,v29,v30,&mat,name);
       sur.push_back(s10); 	  
 	  
 	  
@@ -255,18 +255,18 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
       |/           |/ 
       7------------6
       */	
-	  xcarVector v31(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);        
-	  xcarVector v32(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
-	  xcarVector v33(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
-	  xcarjiTriangleFace *s11 = new xcarjiTriangleFace(v31,v32,v33,mat);
-	  // xcarSurface *s11 = new xcarSurface(v31,v32,v33,&mat,name);
+	  Vector3D v31(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);        
+	  Vector3D v32(mesa[i+7][0]+offsetX,mesa[i+7][1]+offsetY,mesa[i+7][2]+offsetZ);
+	  Vector3D v33(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
+	  TriangleFace *s11 = new TriangleFace(v31,v32,v33,mat);
+	  // Surface *s11 = new Surface(v31,v32,v33,&mat,name);
 	  sur.push_back(s11);
       
-	  xcarVector v34(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);        
-	  xcarVector v35(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
-	  xcarVector v36(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
-	  xcarjiTriangleFace *s12 = new xcarjiTriangleFace(v34,v35,v36,mat);
-	  // xcarSurface *s12 = new xcarSurface(v34,v35,v36,&mat,name);
+	  Vector3D v34(mesa[i+3][0]+offsetX,mesa[i+3][1]+offsetY,mesa[i+3][2]+offsetZ);        
+	  Vector3D v35(mesa[i+6][0]+offsetX,mesa[i+6][1]+offsetY,mesa[i+6][2]+offsetZ);
+	  Vector3D v36(mesa[i+2][0]+offsetX,mesa[i+2][1]+offsetY,mesa[i+2][2]+offsetZ);
+	  TriangleFace *s12 = new TriangleFace(v34,v35,v36,mat);
+	  // Surface *s12 = new Surface(v34,v35,v36,&mat,name);
 	  sur.push_back(s12); 	  
 	  
     }
@@ -275,7 +275,7 @@ xcarjiTriangleFace *s2 = new xcarjiTriangleFace(v4,v5,v6,mat);
 
 }
 
-void getFloor(material mat1, material mat2, std::vector<xcarjiISurface*> &sur, float xmin, float zmin, float xmax, float zmax, float nMos)
+void getFloor(material mat1, material mat2, std::vector<ISurface*> &sur, float xmin, float zmin, float xmax, float zmax, float nMos)
 {
   if(nMos <= 0.0)
     {
@@ -306,26 +306,26 @@ void getFloor(material mat1, material mat2, std::vector<xcarjiISurface*> &sur, f
 	{
 	  x2 = x1 + deltaX;
 	  z2 = z1 + deltaZ;
-	  xcarVector v1(x1,0.0f,z1);
-	  xcarVector v2(x2,0.0f,z1);
-	  xcarVector v3(x1,0.0f,z2);
-	  xcarVector v4(x2,0.0f,z2);
+	  Vector3D v1(x1,0.0f,z1);
+	  Vector3D v2(x2,0.0f,z1);
+	  Vector3D v3(x1,0.0f,z2);
+	  Vector3D v4(x2,0.0f,z2);
 
 	  if((i+j) % 2 == 0)/*Para los materiales*/
 	    {
-	      // xcarjiTriangleFace t1 (v1,v2,v3,mat1);
-	      // xcarjiTriangleFace t2(v2,v4,v3,mat1);
-	      sur.push_back(new xcarjiTriangleFace(v1,v2,v3,mat1));
-	      sur.push_back(new xcarjiTriangleFace(v2,v4,v3,mat1));
+	      // TriangleFace t1 (v1,v2,v3,mat1);
+	      // TriangleFace t2(v2,v4,v3,mat1);
+	      sur.push_back(new TriangleFace(v1,v2,v3,mat1));
+	      sur.push_back(new TriangleFace(v2,v4,v3,mat1));
 	    }
 	  else
 	    {
-	      /*xcarjiTriangleFace t1(v1,v2,v3,mat2);
-	      xcarjiTriangleFace t1(v2,v4,v3,mat2);
+	      /*TriangleFace t1(v1,v2,v3,mat2);
+	      TriangleFace t1(v2,v4,v3,mat2);
 	      surface.push_back(t1);
 	      surface.push_back(t2);*/
-	      sur.push_back(new xcarjiTriangleFace(v1,v2,v3,mat2));
-	      sur.push_back(new xcarjiTriangleFace(v2,v4,v3,mat2));
+	      sur.push_back(new TriangleFace(v1,v2,v3,mat2));
+	      sur.push_back(new TriangleFace(v2,v4,v3,mat2));
 	    }
 	  x1 = x1 + deltaX;
 	}

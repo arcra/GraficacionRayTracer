@@ -1,6 +1,6 @@
 
-#include "xcOperations.h"
-#include <math.h>
+#include "Operations.h"
+#include <cmath>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,9 +11,9 @@
 using namespace std;
 
 
-void multMatrixVector(float** m, const xcarVector& a, xcarVector& r)
+void multMatrixVector3D(float** m, const Vector3D& a, Vector3D& r)
 {
-  xcarVector temp = a;
+  Vector3D temp = a;
   r.x = m[0][0] * temp.x + m[0][1] * temp.y + m[0][2] * temp.z;
   r.y = m[1][0] * temp.x + m[1][1] * temp.y + m[1][2] * temp.z;
   r.z = m[2][0] * temp.x + m[2][1] * temp.y + m[2][2] * temp.z;
@@ -57,6 +57,109 @@ void matrixTranspose(float** m, float **t,int size)
       t[i][j] = m[j][i];
 }
 
+float** getRotationMatrix(float angle_x, float angle_y, float angle_z){
+
+	float **rotacion, **tempRot;
+	float angle;
+	rotacion = (float**)malloc(sizeof(float*)*4);
+	for(int i = 0; i < 4; i++)
+		rotacion[i] = (float*)malloc(sizeof(float)*4);
+
+	tempRot = (float**)malloc(sizeof(float*)*4);
+	for(int i = 0; i < 4; i++)
+		tempRot[i] = (float*)malloc(sizeof(float)*4);
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+			rotacion[i][j] = tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_x != 0.0)
+	{
+	  angle = PI*angle_x/180;
+	  tempRot[1][1] = cos(angle);
+	  tempRot[1][2] = -sin(angle);
+	  tempRot[2][1] = sin(angle);
+	  tempRot[2][2] = cos(angle);
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+		  tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_y != 0.0)
+	{
+	  angle = PI*angle_y/180;
+	  tempRot[0][0] = cos(angle);
+	  tempRot[0][2] = sin(angle);
+	  tempRot[2][0] = -sin(angle);
+	  tempRot[2][2] = cos(angle);
+	  //printMatrix(rotacion,4);
+	  //return (float**)rotacion;
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+			tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_z != 0.0)
+	{
+	  angle = PI*angle_z/180;
+	  tempRot[0][0] = cos(angle);
+	  tempRot[0][1] = -sin(angle);
+	  tempRot[1][0] = sin(angle);
+	  tempRot[1][1] = cos(angle);
+	  //printMatrix(rotacion,4);
+	  //return (float**)rotacion;
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		free(tempRot[i]);
+
+	free(tempRot);
+	return (float**)rotacion;
+}
+
+float** getTranslationMatrix(float tx, float ty, float tz){
+
+	float values[4] = {tx, ty, tz, 1.0f};
+	float **translation = (float**)malloc(4*sizeof(float*));
+	int i, j;
+
+	for(i = 0; i < 4; i++)
+	{
+		translation[i] = (float*)malloc(4*sizeof(float));
+		for(j = 0; j < 4; j++)
+		{
+			if(j == 3)
+				translation[i][j] = values[i];
+			else
+				translation[i][j] = static_cast<float>(i==j);
+		}
+	}
+
+	return translation;
+
+}
+
+float** getScalingMatrix(float sx, float sy, float sz){
+
+	float values[4] = {sx, sy, sz, 1.0f};
+	float **scaling = (float**)malloc(4*sizeof(float*));
+	int i, j;
+
+	for(i = 0; i < 4; i++)
+	{
+		scaling[i] = (float*)malloc(4*sizeof(float));
+		for(j = 0; j < 4; j++)
+			scaling[i][j] = (i==j)?values[i]:0.0f;
+	}
+
+	return scaling;
+}
+
 unsigned char* readBMP(char* filename, int &sizeX, int &sizeY)
 {
   cout << filename << endl;
@@ -93,6 +196,6 @@ unsigned char* readBMP(char* filename, int &sizeX, int &sizeY)
 }
 
 float round(float num, unsigned char decimals){
-	unsigned int factor = pow(10, decimals);
+	unsigned int factor = (unsigned int)pow(10.0f, decimals);
   return floor(num*factor + 0.5)/factor;
 }

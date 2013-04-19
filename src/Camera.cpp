@@ -1,9 +1,9 @@
-#include "xcCamera.h"
+#include "Camera.h"
 #include "stdlib.h"
 #include <iostream>
 using namespace std;
 
-xcCamera::xcCamera(xcarVector& pos, xcarVector& u, xcarVector& dir, bool o)
+Camera::Camera(Vector3D& pos, Vector3D& u, Vector3D& dir, bool o)
 {
   position = pos;
   up = u;
@@ -26,7 +26,7 @@ xcCamera::xcCamera(xcarVector& pos, xcarVector& u, xcarVector& dir, bool o)
   setCameraValues(pos,u,dir);
 }
 
-xcCamera::~xcCamera()
+Camera::~Camera()
 {
   for(int i = 0; i < 4 ; i++)
     {
@@ -38,7 +38,7 @@ xcCamera::~xcCamera()
 }
 
 
-void xcCamera::setCameraValues(xcarVector& pos, xcarVector& u, xcarVector& dir)
+void Camera::setCameraValues(Vector3D& pos, Vector3D& u, Vector3D& dir)
 {
   position = pos;
   up = u;
@@ -53,11 +53,11 @@ void xcCamera::setCameraValues(xcarVector& pos, xcarVector& u, xcarVector& dir)
   setCameraMatrix();
 }
 
-void xcCamera::setCameraMatrix()
+void Camera::setCameraMatrix()
 {
-  xcarVector e1(1.0f, 0.0f, 0.0f);
-  xcarVector e2(0.0f, 1.0f, 0.0f);
-  xcarVector e3(0.0f, 0.0f, 1.0f);
+  Vector3D e1(1.0f, 0.0f, 0.0f);
+  Vector3D e2(0.0f, 1.0f, 0.0f);
+  Vector3D e3(0.0f, 0.0f, 1.0f);
   
   cameraMatrix[0][0] = e1.dotProduct(cameraU);
   cameraMatrix[0][1] = e1.dotProduct(cameraV);
@@ -93,8 +93,8 @@ void xcCamera::setCameraMatrix()
       transpose[j][i] = 0.0f;
 
   matrixTranspose(cameraMatrix,transpose,4);
-  xcarVector temp;
-  multMatrixVector(transpose,position,temp);
+  Vector3D temp;
+  multMatrixVector3D(transpose,position,temp);
   for(int i = 0; i < 4; i++)
     for(int j = 0; j < 4; j++)
       cameraMatrix[i][j] = transpose[i][j];
@@ -116,7 +116,7 @@ void xcCamera::setCameraMatrix()
  
 }
 
-void xcCamera::setProyectionMatrix(float frontPlane, float backPlane, float f)
+void Camera::setProyectionMatrix(float frontPlane, float backPlane, float f)
 {
 
 	cout << "Camera mode: ";
@@ -172,7 +172,7 @@ void xcCamera::setProyectionMatrix(float frontPlane, float backPlane, float f)
   
 }
 
-void xcCamera::setView(float t, float b, float l, float r)
+void Camera::setView(float t, float b, float l, float r)
 {
   top = t;
   bottom = b;

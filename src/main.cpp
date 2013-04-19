@@ -2,23 +2,20 @@
 #include <glib.h>
 #include <iostream>
 #include <cstdlib>
-#include "xcStructures.h"
-#include "xcarVector.h"
-#include "xcarjiRayTracer.h"
-#include "xcarjiSurfaces.h"
+#include "Structures.h"
+#include "Vector3D.h"
+#include "RayTracer.h"
+#include "Surfaces.h"
 #include "puntos.h"
 
 #define IMAGE_WIDTH 700
 #define IMAGE_HEIGHT 700
 
 using namespace std;
-using namespace xcarjiRayTracing;
+using namespace RayTracing;
 
 
-xcarjiRayTracer *rayTracer;
-guchar* rgbbuf;
-/*sphere mySphere, mySphere2, mySphere3;
-  xcarTrianglePlane plano1,plano2;*/
+RayTracer *rayTracer;
 GtkWidget *window, *drawingArea;
 
 void initScene();
@@ -51,39 +48,20 @@ gboolean on_darea_expose (GtkWidget *widget,
   gdk_draw_rgb_image (widget->window,
 		      widget->style->fg_gc[GTK_STATE_NORMAL],
 		      0, 0, IMAGE_WIDTH, IMAGE_HEIGHT,
-		      GDK_RGB_DITHER_MAX, rgbbuf, IMAGE_WIDTH * 3);
+		      GDK_RGB_DITHER_MAX, rayTracer->getImageBuffer(), IMAGE_WIDTH * 3);
   return true;
 }
 
 
-void initRGBbuffer()
-{
-
-  rgbbuf = (guchar*)malloc(sizeof(guchar)*IMAGE_WIDTH * IMAGE_HEIGHT * 3);
-  gint x, y;
-  guchar *pos;
-  pos = rgbbuf;
-  for (y = 0; y < IMAGE_HEIGHT; y++)
-    {
-      for (x = 0; x < IMAGE_WIDTH; x++)
-	{
-	  *pos++ = 0;
-	  *pos++ = 0;
-	  *pos++ = 0;
-	}
-    }
-}
-
 void initScene()
 {
-	initRGBbuffer();
-	rayTracer = new xcarjiRayTracer(IMAGE_WIDTH, IMAGE_HEIGHT, rgbbuf);
+	rayTracer = new RayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-	xcarVector pos(0.0f, 40.0f, 190.0f);
-	xcarVector u(0.0f, 1.0f, 0.0f);
-	xcarVector dir(0.0f, 40.0f, 0.0f);
+	Vector3D pos(0.0f, 40.0f, 190.0f);
+	Vector3D u(0.0f, 1.0f, 0.0f);
+	Vector3D dir(0.0f, 40.0f, 0.0f);
 
-	rayTracer->camera = new xcCamera(pos,u,dir,true);
+	rayTracer->camera = new Camera(pos,u,dir,true);
 	rayTracer->camera->setView(60.0f,20.0f,-20.0f,20.0f);
 	rayTracer->camera->focalPoint = 110.0f;
 
@@ -91,40 +69,40 @@ void initScene()
 
 //	rayTracer->addLight(30.0f, 40.0f, -10.0f, 0.7f, 0.7f, 1.0f);
 
-	xcarVector nullVector(0.0f, 0.0f, 0.0f);
-	xcarVector lowVector(0.2f, 0.2f, 0.2f);
-	xcarVector medVector(0.5f, 0.5f, 0.5f);
-	xcarVector hiVector(0.9f, 0.9f, 0.9f);
-	xcarVector fullVector(1.0f, 1.0f, 1.0f);
+	Vector3D nullVector3D(0.0f, 0.0f, 0.0f);
+	Vector3D lowVector3D(0.2f, 0.2f, 0.2f);
+	Vector3D medVector3D(0.5f, 0.5f, 0.5f);
+	Vector3D hiVector3D(0.9f, 0.9f, 0.9f);
+	Vector3D fullVector3D(1.0f, 1.0f, 1.0f);
 
 
 	material matTable;
 	matTable.diffuse.x = 0.63f;
 	matTable.diffuse.y = 0.32f;
 	matTable.diffuse.z = 0.18f;
-	matTable.specular = lowVector;
-	matTable.reflective = nullVector;
+	matTable.specular = lowVector3D;
+	matTable.reflective = nullVector3D;
 	matTable.shininess = 1.0f;
 
 	material matfloor1;
 	matfloor1.diffuse.x = 0.0f;
 	matfloor1.diffuse.y = 0.0f;
 	matfloor1.diffuse.z = 0.0f;
-	xcarVector specularF1(1.0f,1.0f,1.0f);
+	Vector3D specularF1(1.0f,1.0f,1.0f);
 	matfloor1.specular = specularF1;
-	xcarVector reflectiveF1(0.2f,0.2f,0.2f);
+	Vector3D reflectiveF1(0.2f,0.2f,0.2f);
 //	matfloor1.reflective = reflectiveF1;
-	matfloor1.reflective = nullVector;
+	matfloor1.reflective = nullVector3D;
 	matfloor1.shininess = 0.3f;
 
 	material matfloor2;
 	matfloor2.diffuse.x = 1.0f;
 	matfloor2.diffuse.y = 1.0f;
 	matfloor2.diffuse.z = 1.0f;
-	xcarVector specularF2(1.0f,1.0f,1.0f);
+	Vector3D specularF2(1.0f,1.0f,1.0f);
 	matfloor2.specular = specularF1;
-//	xcarVector reflectiveF2(0.5f,0.5f,0.5f);
-	matfloor2.reflective = nullVector;
+//	Vector3D reflectiveF2(0.5f,0.5f,0.5f);
+	matfloor2.reflective = nullVector3D;
 	matfloor2.shininess = 0.3f;
 
 
@@ -132,8 +110,8 @@ void initScene()
 	matLeft.diffuse.x = 0.0f;
 	matLeft.diffuse.y = 0.0f;
 	matLeft.diffuse.z = 1.0f;
-	matLeft.specular = nullVector;
-	matLeft.reflective = nullVector;
+	matLeft.specular = nullVector3D;
+	matLeft.reflective = nullVector3D;
 	matLeft.shininess = 0.1f;
 
 
@@ -142,8 +120,8 @@ void initScene()
 	matBack.diffuse.x = 1.0f;
 	matBack.diffuse.y = 1.0f;
 	matBack.diffuse.z = 1.0f;
-	matBack.specular = nullVector;
-	matBack.reflective = fullVector;
+	matBack.specular = nullVector3D;
+	matBack.reflective = fullVector3D;
 	matBack.shininess = 0.02f;
 
 
@@ -151,8 +129,8 @@ void initScene()
 	matFront.diffuse.x = 0.0f;
 	matFront.diffuse.y = 1.0f;
 	matFront.diffuse.z = 0.0f;
-	matFront.specular = nullVector;
-	matFront.reflective = nullVector;
+	matFront.specular = nullVector3D;
+	matFront.reflective = nullVector3D;
 	matFront.shininess = 1.0f;
 
 
@@ -161,8 +139,8 @@ void initScene()
 	matRight.diffuse.x = 1.0f;
 	matRight.diffuse.y = 0.0f;
 	matRight.diffuse.z = 0.0f;
-	matRight.specular = nullVector;
-	matRight.reflective = nullVector;
+	matRight.specular = nullVector3D;
+	matRight.reflective = nullVector3D;
 	matRight.shininess = 0.1f;
 
 
@@ -171,66 +149,66 @@ void initScene()
 	matTop.diffuse.x = 0.4f;
 	matTop.diffuse.y = 0.2f;
 	matTop.diffuse.z = 0.3f;
-	matTop.specular = nullVector;
-	matTop.reflective = nullVector;
+	matTop.specular = nullVector3D;
+	matTop.reflective = nullVector3D;
 	matTop.shininess = 0.1f;
 
 	material matSp1;
 	matSp1.diffuse.x = 0.0f;
 	matSp1.diffuse.y = 1.0f;
 	matSp1.diffuse.z = 1.0f;
-	matSp1.specular = nullVector;
-	matSp1.reflective = medVector;
+	matSp1.specular = nullVector3D;
+	matSp1.reflective = medVector3D;
 	matSp1.shininess = 0.5f;
 
 	material matSp2;
 	matSp2.diffuse.x = 0.6f;
 	matSp2.diffuse.y = 0.6f;
 	matSp2.diffuse.z = 0.6f;
-	matSp2.specular = hiVector;
-	matSp2.reflective = fullVector;
+	matSp2.specular = hiVector3D;
+	matSp2.reflective = fullVector3D;
 	matSp2.shininess = 0.08f;
 
 	material matSp3;
 	matSp3.diffuse.x = 1.0f;
 	matSp3.diffuse.y = 1.0f;
 	matSp3.diffuse.z = 1.0f;
-	matSp3.specular = nullVector;
-	matSp3.reflective = nullVector;
+	matSp3.specular = nullVector3D;
+	matSp3.reflective = nullVector3D;
 	matSp3.shininess = 0.0f;
 
 
-	xcarVector v1bis( 80.0f, 0.0f, 80.0f);
-	xcarVector v2bis( 80.0f, 0.0f,-80.0f);
-	xcarVector v3bis(-80.0f, 0.0f,-80.0f);
-	xcarVector v4bis(-80.0f, 0.0f, 80.0f);
+	Vector3D v1bis( 80.0f, 0.0f, 80.0f);
+	Vector3D v2bis( 80.0f, 0.0f,-80.0f);
+	Vector3D v3bis(-80.0f, 0.0f,-80.0f);
+	Vector3D v4bis(-80.0f, 0.0f, 80.0f);
 
-	xcarVector v1( 40.0f, 0.0f, 40.0f);
-	xcarVector v2( 40.0f, 0.0f,-40.0f);
-	xcarVector v3(-40.0f, 0.0f,-40.0f);
-	xcarVector v4(-40.0f, 0.0f, 40.0f);
+	Vector3D v1( 40.0f, 0.0f, 40.0f);
+	Vector3D v2( 40.0f, 0.0f,-40.0f);
+	Vector3D v3(-40.0f, 0.0f,-40.0f);
+	Vector3D v4(-40.0f, 0.0f, 40.0f);
 
-	xcarVector v5(-40.0f, 80.0f, 40.0f);
-	xcarVector v6( 40.0f, 80.0f, 40.0f);
-	xcarVector v7( 40.0f, 80.0f,-40.0f);
-	xcarVector v8(-40.0f, 80.0f,-40.0f);
+	Vector3D v5(-40.0f, 80.0f, 40.0f);
+	Vector3D v6( 40.0f, 80.0f, 40.0f);
+	Vector3D v7( 40.0f, 80.0f,-40.0f);
+	Vector3D v8(-40.0f, 80.0f,-40.0f);
 
-	getFloor(matfloor1, matfloor2, rayTracer->surfaces,-40,-40,40,40,10.0);
+	//getFloor(matfloor1, matfloor2, rayTracer->surfaces,-40,-40,40,40,10.0);
 
-	xcarjiTriangleFace *plane3 = new xcarjiTriangleFace(v4,v3,v5,matLeft);
-	xcarjiTriangleFace *plane4 = new xcarjiTriangleFace(v5,v3,v8,matLeft);
+	TriangleFace *plane3 = new TriangleFace(v4,v3,v5,matLeft);
+	TriangleFace *plane4 = new TriangleFace(v5,v3,v8,matLeft);
 
-	xcarjiTriangleFace *plane5 = new xcarjiTriangleFace(v3,v2,v8,matBack);
-	xcarjiTriangleFace *plane6 = new xcarjiTriangleFace(v2,v7,v8,matBack);
+	TriangleFace *plane5 = new TriangleFace(v3,v2,v8,matBack);
+	TriangleFace *plane6 = new TriangleFace(v2,v7,v8,matBack);
 
-	xcarjiTriangleFace *plane7 = new xcarjiTriangleFace(v2,v1,v6,matRight);
-	xcarjiTriangleFace *plane8 = new xcarjiTriangleFace(v2,v6,v7,matRight);
+	TriangleFace *plane7 = new TriangleFace(v2,v1,v6,matRight);
+	TriangleFace *plane8 = new TriangleFace(v2,v6,v7,matRight);
 
-	xcarjiTriangleFace *plane9 = new xcarjiTriangleFace(v8,v7,v6,matTop);
-	xcarjiTriangleFace *plane10 = new xcarjiTriangleFace(v8,v6,v5,matTop);
+	TriangleFace *plane9 = new TriangleFace(v8,v7,v6,matTop);
+	TriangleFace *plane10 = new TriangleFace(v8,v6,v5,matTop);
 
-	xcarjiTriangleFace *plane11 = new xcarjiTriangleFace(v4,v5,v6,matFront, false);
-	xcarjiTriangleFace *plane12 = new xcarjiTriangleFace(v4,v6,v1,matFront, false);
+	TriangleFace *plane11 = new TriangleFace(v4,v5,v6,matFront, false);
+	TriangleFace *plane12 = new TriangleFace(v4,v6,v1,matFront, false);
 
 	float offsetX1,offsetX2,
 	    offsetY1,offsetY2,
@@ -238,42 +216,40 @@ void initScene()
 
 	radio = 8.0f;
 
-	xcarVector centroMesa1(10.5f,21.0f,21.0f);
-	xcarVector centroMesa2(10.5f,21.0f,21.0f);
+	Vector3D centroMesa1(10.5f,21.0f,21.0f);
+	Vector3D centroMesa2(10.5f,21.0f,21.0f);
 
 	offsetX1 = 10.0f;
 	offsetY1 = -5.0f;
 	offsetZ1 = 10.0f;
-	xcarVector offsetM1(offsetX1,offsetY1,offsetZ1);
+	Vector3D offsetM1(offsetX1,offsetY1,offsetZ1);
 	offsetX2 = -30.0f;
 	offsetY2 = -5.0f;
 	offsetZ2 = -30.0f;
-	xcarVector offsetM2(offsetX2,offsetY2,offsetZ2);
+	Vector3D offsetM2(offsetX2,offsetY2,offsetZ2);
 
-	xcarVector sphpos1(0.0f,radio,0.0f);
-	xcarVector sphpos2(0.0f,radio,0.0f);
-	xcarVector sphpos3(0.0f,79.0f,0.0f);
+	Vector3D sphpos1(0.0f,radio,0.0f);
+	Vector3D sphpos2(0.0f,radio,0.0f);
+	Vector3D sphpos3(0.0f,79.0f,0.0f);
 
-	xcarjiSphere *sphere1 = new xcarjiSphere(radio,sphpos1+offsetM1+centroMesa1,matSp1);
-	xcarjiSphere *sphere2 = new xcarjiSphere(radio,sphpos2+offsetM2+centroMesa2,matSp2);
-	xcarjiSphere *sphere3 = new xcarjiSphere(0.5f,sphpos3,matSp3);
+	Sphere *sphere1 = new Sphere(radio,sphpos1+offsetM1+centroMesa1,matSp1);
+	Sphere *sphere2 = new Sphere(radio,sphpos2+offsetM2+centroMesa2,matSp2);
+	Sphere *sphere3 = new Sphere(0.5f,sphpos3,matSp3);
 
-	rayTracer->surfaces.push_back(plane5);
-	rayTracer->surfaces.push_back(plane6);
-	rayTracer->surfaces.push_back(plane7);
-	rayTracer->surfaces.push_back(plane8);
-	rayTracer->surfaces.push_back(plane3);
-	rayTracer->surfaces.push_back(plane4);
-	rayTracer->surfaces.push_back(plane9);
-	rayTracer->surfaces.push_back(plane10);
-	rayTracer->surfaces.push_back(plane11);
-	rayTracer->surfaces.push_back(plane12);
-	rayTracer->surfaces.push_back(sphere1);
-	rayTracer->surfaces.push_back(sphere2);
-	rayTracer->surfaces.push_back(sphere3);
 
-	getSurfaces(matTable,rayTracer->surfaces,offsetX1,offsetY1,offsetZ1);
-	getSurfaces(matTable,rayTracer->surfaces,offsetX2,offsetY2,offsetZ2);
+	rayTracer->addSurface(plane5);
+	rayTracer->addSurface(plane6);
+	rayTracer->addSurface(plane7);
+	rayTracer->addSurface(plane8);
+	rayTracer->addSurface(plane3);
+	rayTracer->addSurface(plane4);
+	rayTracer->addSurface(plane9);
+	rayTracer->addSurface(plane10);
+	rayTracer->addSurface(plane11);
+	rayTracer->addSurface(plane12);
+	rayTracer->addSurface(sphere1);
+	rayTracer->addSurface(sphere2);
+	rayTracer->addSurface(sphere3);
 
 }
 

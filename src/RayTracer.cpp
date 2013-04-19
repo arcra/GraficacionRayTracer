@@ -1,28 +1,45 @@
 /*
- * xcarjiRayTracer.cpp
+ * RayTracer.cpp
  *
  *  Created on: Apr 5, 2013
  *      Author: arcra
  */
 
+#include <glib.h>
 #include <cstdlib>
 #include <cmath>
+#include <cfloat>
 #include <stack>
-#include "xcarjiRayTracer.h"
-#include "xcStructures.h"
+#include "RayTracer.h"
+#include "Structures.h"
 
 using namespace std;
 
-namespace xcarjiRayTracing {
+namespace RayTracing {
 
-xcarjiRayTracer::xcarjiRayTracer(int width, int height, unsigned char *imageBuffer)
+RayTracer::RayTracer(int width, int height)
 {
 	this->width = width;
 	this->height = height;
-	this->rgbBuffer = imageBuffer;
+
+	this->rgbBuffer = (guchar*)malloc(sizeof(guchar)*this->width * this->height * 3);
+	unsigned int x, y;
+	unsigned char *pos;
+	pos = this->rgbBuffer;
+	for (y = 0; y < this->height; y++)
+	{
+		for (x = 0; x < this->width; x++)
+		{
+			*pos++ = 0;
+			*pos++ = 0;
+			*pos++ = 0;
+		}
+	}
+
+	this->loadIdentity();
 }
 
-void xcarjiRayTracer::addLight(xcarVector pos, float r, float g, float b)
+void RayTracer::addLight(Vector3D pos, float r, float g, float b)
 {
 	light l;
 	l.position = pos;
@@ -32,7 +49,7 @@ void xcarjiRayTracer::addLight(xcarVector pos, float r, float g, float b)
 	lights.push_back(l);
 }
 
-void xcarjiRayTracer::addLight(float x, float y, float z, float r, float g, float b)
+void RayTracer::addLight(float x, float y, float z, float r, float g, float b)
 {
 	light l;
 	l.position.x = x;
@@ -44,15 +61,22 @@ void xcarjiRayTracer::addLight(float x, float y, float z, float r, float g, floa
 	lights.push_back(l);
 }
 
-void xcarjiRayTracer::renderScence(){
+void RayTracer::addSurface(ISurface* surf)
+{
+	surf->applyTransformation(this->transgormationMatrix);
+	this->surfaces.push_back(surf);
+}
+
+void RayTracer::renderScence()
+{
 
 	unsigned int i, j, k, surfaceIndex;
 	ray currentRay;
 	rayBounce rayBounceInfo;
 	rayBounce previousBounce;
 	float us,vs,ws, minT, diffuseFactor;
-	xcarVector lv, observerVec, h;
-	xcarVector diffuse, specular, ambient, rgb;
+	Vector3D lv, observerVec, h;
+	Vector3D diffuse, specular, ambient, rgb;
 	unsigned int lightCount;
 
 	for(j = 0; j < height; j++)
@@ -66,7 +90,7 @@ void xcarjiRayTracer::renderScence(){
 			ws = camera->focalPoint;
 
 			currentRay.e = camera->position;
-			currentRay.s = xcarVector(us, vs, ws);
+			currentRay.s = Vector3D(us, vs, ws);
 			if(currentRay.e.x == currentRay.s.x && currentRay.e.y == currentRay.s.y && currentRay.e.z == currentRay.s.z)
 			{
 				continue;
@@ -187,7 +211,85 @@ void xcarjiRayTracer::renderScence(){
 	}
 }
 
-bool xcarjiRayTracer::pathToLightIsClear(xcarVector point, xcarVector lightPosition)
+unsigned char* RayTracer::getImageBuffer()
+{
+
+	return this->rgbBuffer;
+}
+
+void  RayTracer::loadIdentity()
+{
+	int i;
+	float** temp;
+	while(!this->matrixStack.empty())
+	{
+		temp = this->matrixStack.top();
+		this->matrixStack.pop();
+		for(i = 0; i < 4; i++)
+			free(temp[i]);
+		free(temp);
+	}
+
+	temp = (float**)malloc(4*sizeof(float*));
+
+	for(i = 0; i < 4; i++){
+		temp[i] = (float*)malloc(4*sizeof(float));
+		for(int j = 0; j < 4; j++){
+			temp[i][j] = static_cast<float>(i == j);
+		}
+	}
+	this->matrixStack.push(temp);
+	this->transgormationMatrix = this->matrixStack.top();
+}
+
+void RayTracer::rotate(float angle_x, float angle_y, float angle_z)
+{
+	float** rotationMatrix = getRotationMatrix(angle_x, angle_y, angle_z);
+	multMatrix4Matrix4(rotationMatrix, this->transgormationMatrix, this->transgormationMatrix);
+}
+
+void RayTracer::scale(float sx, float sy, float sz)
+{
+	float** scalingMatrix = getScalingMatrix(sx, sy, sz);
+	multMatrix4Matrix4(scalingMatrix, this->transgormationMatrix, this->transgormationMatrix);
+}
+
+void RayTracer::translate(float tx, float ty, float tz)
+{
+	float** translationMatrix = getTranslationMatrix(tx, ty, tz);
+	multMatrix4Matrix4(translationMatrix, this->transgormationMatrix, this->transgormationMatrix);
+}
+
+void RayTracer::pushMatrix()
+{
+	int i,j;
+
+	float **m = (float**)malloc(4*sizeof(float*));
+
+	for(i = 0; i < 4; i++)
+	{
+		m[i] = (float*)malloc(4*sizeof(float));
+		for(j = 0; j < 4; j++)
+			m[i][j] = this->transgormationMatrix[i][j];
+	}
+	this->matrixStack.push(m);
+}
+
+void RayTracer::popMatrix()
+{
+	int i;
+	float** temp;
+	temp = this->matrixStack.top();
+	this->matrixStack.pop();
+	for(i = 0; i < 4; i++)
+		free(temp[i]);
+	free(temp);
+
+	this->transgormationMatrix = this->matrixStack.top();
+}
+
+
+bool RayTracer::pathToLightIsClear(Vector3D point, Vector3D lightPosition)
 {
 	ray pathRay;
 	pathRay.e = point;
@@ -203,7 +305,7 @@ bool xcarjiRayTracer::pathToLightIsClear(xcarVector point, xcarVector lightPosit
 	return true;
 }
 
-bool xcarjiRayTracer::findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex, bool ignoreNotDrawable)
+bool RayTracer::findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex, bool ignoreNotDrawable)
 {
 	bool intersectionFound = false;
 	unsigned int l;
@@ -223,22 +325,22 @@ bool xcarjiRayTracer::findClosestIntersection(ray& currentRay, float& minT, unsi
 	return intersectionFound;
 }
 
-ray xcarjiRayTracer::getBouncedRay(xcarjiISurface *surface, ray& r1, float t)
+ray RayTracer::getBouncedRay(ISurface *surface, ray& r1, float t)
 {
-	xcarVector d = r1.s - r1.e;
-	xcarVector e2 = r1.e + t * d;
-	xcarVector surfNormal = surface->computeNormal(e2);
-	xcarVector reflectedVector = d - (2*d.dotProduct(surfNormal))*surfNormal;
+	Vector3D d = r1.s - r1.e;
+	Vector3D e2 = r1.e + t * d;
+	Vector3D surfNormal = surface->computeNormal(e2);
+	Vector3D reflectedVector3D = d - (2*d.dotProduct(surfNormal))*surfNormal;
 
 	ray r2 = r1;
 
 	r2.e = e2;
-	r2.s = reflectedVector + e2;
+	r2.s = reflectedVector3D + e2;
 
 	return r2;
 }
 
-void xcarjiRayTracer::drawPixel(int i, int j, float r, float g, float b)
+void RayTracer::drawPixel(int i, int j, float r, float g, float b)
 {
 	j = height - 1 - j;
 	unsigned int ind = 3*(j*width + i);
@@ -248,7 +350,7 @@ void xcarjiRayTracer::drawPixel(int i, int j, float r, float g, float b)
 	rgbBuffer[ind+2] = static_cast<unsigned char>(b*255);
 }
 
-xcarjiRayTracer::~xcarjiRayTracer()
+RayTracer::~RayTracer()
 {
 	surfaces.clear();
 	lights.clear();
@@ -256,4 +358,4 @@ xcarjiRayTracer::~xcarjiRayTracer()
 	free(rgbBuffer);
 }
 
-} /* namespace xcarjiRayTracing */
+} /* namespace RayTracing */

@@ -1,36 +1,36 @@
-#ifndef XCSTRUCTS_H
-#define XCSTRUCTS_H
+#ifndef STRUCTS_H
+#define STRUCTS_H
 
 #include <gtk/gtk.h>
-#include "xcarVector.h"
+#include "Vector3D.h"
 
-using namespace xcarGL;
+using namespace GL;
 
 typedef struct
 {
-  xcarVector diffuse, specular, reflective;
+  Vector3D diffuse, specular, reflective;
   float shininess;
 }material;
 
 typedef struct
 {
-  xcarVector e;
-  xcarVector s;
+  Vector3D e;
+  Vector3D s;
   
   float lifeSpan;
 }ray;
 
 typedef struct
 {
-	xcarVector point;
-	xcarVector normal;
+	Vector3D point;
+	Vector3D normal;
 	material mat;
 }rayBounce;
 
 typedef struct
 {
-  xcarVector position;
-  xcarVector rgb;
+  Vector3D position;
+  Vector3D rgb;
   float constant_attenuation_coeff;//= 0.25;
   float linear_attenuation_coeff;// = 0.003372407;
   float quadratic_attenuation_coeff;// = 0.000045492;

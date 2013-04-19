@@ -1,39 +1,44 @@
 /*
- * xcarjiSphere.cpp
+ * Sphere.cpp
  *
  *  Created on: Apr 4, 2013
  *      Author: arcra
  */
 
-#include "xcarjiSphere.h"
-#include "xcOperations.h"
+#include "Sphere.h"
+#include "Operations.h"
 #include <cmath>
 #include <iostream>
 
 using namespace std;
 
-namespace xcarjiRayTracing
+namespace RayTracing
 {
 
-	xcarjiSphere::xcarjiSphere(float radius, xcarVector center, bool drawIt)  : xcarjiISurface(){
+	Sphere::Sphere(float radius, Vector3D center, bool drawIt)  : ISurface()
+	{
 
 		this->radius = radius;
 		this->center = center;
 		this->drawable = drawIt;
+		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
-	xcarjiSphere::xcarjiSphere(float radius, xcarVector center, material m, bool drawIt)  : xcarjiISurface(){
+	Sphere::Sphere(float radius, Vector3D center, material m, bool drawIt)  : ISurface()
+	{
 
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
 		this->drawable = drawIt;
+		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
 
-	bool xcarjiSphere::isSurfaceHit(ray r, float& t){
-		xcarVector d = r.s - r.e;
-		xcarVector e_c = r.e - center;
+	bool Sphere::isSurfaceHit(ray r, float& t)
+	{
+		Vector3D d = r.s - r.e;
+		Vector3D e_c = r.e - center;
 
 		float discrim =  (d.dotProduct(e_c) *  d.dotProduct(e_c)) -
 		(d.dotProduct(d) * (e_c.dotProduct(e_c) - (radius*radius)));
@@ -52,11 +57,16 @@ namespace xcarjiRayTracing
 		return true;
 	}
 
-	xcarVector xcarjiSphere::computeNormal(xcarVector point){
+	Vector3D Sphere::computeNormal(Vector3D point)
+	{
 
 		normal = (point - center).getNormal();
 		return normal;
 	}
 
+	void Sphere::applyTransformation(float** m)
+	{
+		multMatrixVector3D(m, this->origin, this->origin);
+	}
 
 }
