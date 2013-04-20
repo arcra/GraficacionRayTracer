@@ -19,8 +19,8 @@ namespace RayTracing {
 			Vector3D v2;
 			Vector3D v3;
 
-			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, bool drawIt=true);
-			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m, bool drawIt=true);
+			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3);
+			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m);
 
 			virtual bool isSurfaceHit(ray r, float& t);
 			virtual Vector3D computeNormal(Vector3D point);

@@ -49,7 +49,7 @@ protected:
 	void popMatrix();
 
 	bool pathToLightIsClear(Vector3D point, Vector3D lightPosition);
-	bool findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex, bool ignoreNotDrawable=false);
+	bool findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex);
 	ray getBouncedRay(ISurface* surface, ray& r1, float t);
 	void drawPixel(int i, int j, float r, float g, float b);
 };

@@ -8,15 +8,15 @@ HEADERSDIR= headers
 SOURCESDIR= src
 BINDIR= bin
 
-ELUDED=ISurface.cpp
+EXCLUDED=ISurface.cpp
 
 INCLUDESDIR=$(HEADERSDIR)/
 
 HEADERS= $(wildcard $(HEADERSDIR)/*.h)
-SOURCES= $(filter-out $(addprefix $(SOURCESDIR)/,$(ELUDED)),$(wildcard $(SOURCESDIR)/*.cpp))
+SOURCES= $(filter-out $(addprefix $(SOURCESDIR)/,$(EXCLUDED)),$(wildcard $(SOURCESDIR)/*.cpp))
 
 OBJECTS = $(patsubst $(SOURCESDIR)/%.cpp, $(BINDIR)/%.o, $(SOURCES))
-EXECUTABLE=Proyecto1
+EXECUTABLE=RayTracer
 
 all: $(SOURCES) $(EXECUTABLE)
 

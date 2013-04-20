@@ -21,8 +21,8 @@ namespace RayTracing
 			Vector3D center;
 			Vector3D origin;
 
-			Sphere(float radius, Vector3D center, bool drawIt=true);
-			Sphere(float radius, Vector3D center, material m, bool drawIt=true);
+			Sphere(float radius, Vector3D center);
+			Sphere(float radius, Vector3D center, material m);
 
 			virtual bool isSurfaceHit(ray r, float& t);
 			virtual Vector3D computeNormal(Vector3D point);

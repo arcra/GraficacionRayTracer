@@ -13,21 +13,19 @@ using namespace std;
 
 namespace RayTracing {
 
-TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, bool drawIt) {
+TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3) {
 
 	this->v1 = v1;
 	this->v2 = v2;
 	this->v3 = v3;
-	this->drawable = drawIt;
 }
 
-TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m, bool drawIt) {
+TriangleFace::TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m) {
 
 	this->v1 = v1;
 	this->v2 = v2;
 	this->v3 = v3;
 	this->mat = m;
-	this->drawable = drawIt;
 }
 
 bool TriangleFace::isSurfaceHit(ray r, float& t)

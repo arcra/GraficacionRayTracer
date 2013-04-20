@@ -1,5 +1,5 @@
 #include <gtk/gtk.h>
-#include <glib.h>
+#include <glib/gtypes.h>
 #include <iostream>
 #include <cstdlib>
 #include "Structures.h"
@@ -121,7 +121,7 @@ void initScene()
 	matBack.diffuse.y = 1.0f;
 	matBack.diffuse.z = 1.0f;
 	matBack.specular = nullVector3D;
-	matBack.reflective = fullVector3D;
+	matBack.reflective = nullVector3D;
 	matBack.shininess = 0.02f;
 
 
@@ -154,20 +154,20 @@ void initScene()
 	matTop.shininess = 0.1f;
 
 	material matSp1;
-	matSp1.diffuse.x = 0.0f;
-	matSp1.diffuse.y = 1.0f;
-	matSp1.diffuse.z = 1.0f;
-	matSp1.specular = nullVector3D;
+	matSp1.diffuse.x = 1.0f;
+	matSp1.diffuse.y = 0.85f;
+	matSp1.diffuse.z = 0.0f;
+	matSp1.specular = fullVector3D;
 	matSp1.reflective = medVector3D;
-	matSp1.shininess = 0.5f;
+	matSp1.shininess = 25.0f;
 
 	material matSp2;
 	matSp2.diffuse.x = 0.6f;
 	matSp2.diffuse.y = 0.6f;
 	matSp2.diffuse.z = 0.6f;
-	matSp2.specular = hiVector3D;
+	matSp2.specular = medVector3D;
 	matSp2.reflective = fullVector3D;
-	matSp2.shininess = 0.08f;
+	matSp2.shininess = 25.0f;
 
 	material matSp3;
 	matSp3.diffuse.x = 1.0f;
@@ -175,7 +175,7 @@ void initScene()
 	matSp3.diffuse.z = 1.0f;
 	matSp3.specular = nullVector3D;
 	matSp3.reflective = nullVector3D;
-	matSp3.shininess = 0.0f;
+	matSp3.shininess = 1.0f;
 
 
 	Vector3D v1bis( 80.0f, 0.0f, 80.0f);
@@ -207,8 +207,8 @@ void initScene()
 	TriangleFace *plane9 = new TriangleFace(v8,v7,v6,matTop);
 	TriangleFace *plane10 = new TriangleFace(v8,v6,v5,matTop);
 
-	TriangleFace *plane11 = new TriangleFace(v4,v5,v6,matFront, false);
-	TriangleFace *plane12 = new TriangleFace(v4,v6,v1,matFront, false);
+	TriangleFace *plane11 = new TriangleFace(v4,v5,v6,matFront);
+	TriangleFace *plane12 = new TriangleFace(v4,v6,v1,matFront);
 
 	float offsetX1,offsetX2,
 	    offsetY1,offsetY2,

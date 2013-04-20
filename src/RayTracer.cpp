@@ -5,7 +5,7 @@
  *      Author: arcra
  */
 
-#include <glib.h>
+#include <glib/gtypes.h>
 #include <cstdlib>
 #include <cmath>
 #include <cfloat>
@@ -98,7 +98,7 @@ void RayTracer::renderScence()
 			currentRay.lifeSpan = 1.0;
 			stack<rayBounce> bounceStack;
 
-			if(!findClosestIntersection(currentRay, minT, surfaceIndex, true))
+			if(!findClosestIntersection(currentRay, minT, surfaceIndex))
 				continue;
 
 			ambient = surfaces[surfaceIndex]->mat.diffuse;
@@ -305,16 +305,14 @@ bool RayTracer::pathToLightIsClear(Vector3D point, Vector3D lightPosition)
 	return true;
 }
 
-bool RayTracer::findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex, bool ignoreNotDrawable)
+bool RayTracer::findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex)
 {
 	bool intersectionFound = false;
 	unsigned int l;
 	minT = FLT_MAX;
 	float t;
 	for(l = 0; l < surfaces.size(); l++){
-		if(ignoreNotDrawable && !surfaces[l]->drawable)
-			continue;
-		if( surfaces[l]->isSurfaceHit(currentRay,t)){
+		if( surfaces[l]->isSurfaceHit(currentRay,t) && surfaces[l]->computeNormal(currentRay.e + t*(currentRay.s - currentRay.e)).dotProduct(currentRay.e - currentRay.s) > 0.0f){
 			intersectionFound = true;
 			if(t < minT){
 				minT = t;

@@ -15,22 +15,20 @@ using namespace std;
 namespace RayTracing
 {
 
-	Sphere::Sphere(float radius, Vector3D center, bool drawIt)  : ISurface()
+	Sphere::Sphere(float radius, Vector3D center)  : ISurface()
 	{
 
 		this->radius = radius;
 		this->center = center;
-		this->drawable = drawIt;
 		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
-	Sphere::Sphere(float radius, Vector3D center, material m, bool drawIt)  : ISurface()
+	Sphere::Sphere(float radius, Vector3D center, material m)  : ISurface()
 	{
 
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
-		this->drawable = drawIt;
 		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 

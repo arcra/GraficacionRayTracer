@@ -20,13 +20,14 @@ namespace RayTracing
 		public:
 			Vector3D normal;
 			material mat;
-			bool drawable;
+			unsigned char* textureMap;
+			unsigned char* bumpMap;
+			int mapSizeX, mapSizeY;
 
-			virtual ~ISurface() {}
 			virtual bool isSurfaceHit(const ray r, float& t) = 0;
 			virtual Vector3D computeNormal(Vector3D point) = 0;
 			virtual void applyTransformation(float** m) = 0;
-
+			virtual ~ISurface() {}
 	};
 }
 #endif /* ISURFACE_H_ */
