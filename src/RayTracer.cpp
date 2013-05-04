@@ -78,6 +78,9 @@ void RayTracer::renderScence()
 	Vector3D diffuse, specular, ambient, rgb;
 	unsigned int lightCount;
 
+	Vector3D matDiffuse, surfNormal;
+	int u, v;
+
 	for(j = 0; j < height; j++)
 	{
 		for(i = 0; i < width; i++)
@@ -101,23 +104,25 @@ void RayTracer::renderScence()
 			rayBounceInfo.point.x = round(rayBounceInfo.point.x, 4);
 			rayBounceInfo.point.y = round(rayBounceInfo.point.y, 4);
 			rayBounceInfo.point.z = round(rayBounceInfo.point.z, 4);
-			rayBounceInfo.normal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
+
+			if(surfaces[surfaceIndex]->mat.textureMap || surfaces[surfaceIndex]->mat.bumpMap)
+				surfaces[surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
+
+			if(surfaces[surfaceIndex]->mat.textureMap)
+				getTexturePixelToVector3D(u, v, matDiffuse, surfaces[surfaceIndex]->mat.textureMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
+			else
+				matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
+
+			surfNormal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
+			if(surfaces[surfaceIndex]->mat.bumpMap)
+				getTexturePixelToVector3D(u, v, surfNormal, surfaces[surfaceIndex]->mat.bumpMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
+
+//			rayBounceInfo.normal = (surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point) + bumpNormal).getNormal();
+			rayBounceInfo.normal = surfNormal;
 			rayBounceInfo.mat = surfaces[surfaceIndex]->mat;
 			rayBounceInfo.surfaceIndex = surfaceIndex;
 
 			bounceStack.push(rayBounceInfo);
-
-			Vector3D matDiffuse;
-			if(surfaces[surfaceIndex]->mat.textureMap)
-			{
-				int u, v;
-				surfaces[surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
-				getTexturePixelToVector3D(u, v, matDiffuse, surfaces[surfaceIndex]->mat.textureMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
-			}
-			else
-			{
-				matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
-			}
 
 			ambient = matDiffuse;
 
@@ -131,7 +136,21 @@ void RayTracer::renderScence()
 				rayBounceInfo.point.x = round(rayBounceInfo.point.x, 4);
 				rayBounceInfo.point.y = round(rayBounceInfo.point.y, 4);
 				rayBounceInfo.point.z = round(rayBounceInfo.point.z, 4);
-				rayBounceInfo.normal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
+
+//				surfNormal.x = 0.0f;
+//				surfNormal.y = 0.0f;
+//				surfNormal.z = 0.0f;
+
+				surfNormal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
+
+				if(surfaces[surfaceIndex]->mat.bumpMap)
+				{
+					surfaces[surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
+					getTexturePixelToVector3D(u, v, surfNormal, surfaces[surfaceIndex]->mat.bumpMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
+				}
+
+//				rayBounceInfo.normal = (surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point) + bumpNormal).getNormal();
+				rayBounceInfo.normal = surfNormal;
 				rayBounceInfo.mat = surfaces[surfaceIndex]->mat;
 				rayBounceInfo.surfaceIndex = surfaceIndex;
 
@@ -162,7 +181,6 @@ void RayTracer::renderScence()
 
 				if(rayBounceInfo.mat.textureMap)
 				{
-					int u, v;
 					surfaces[rayBounceInfo.surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
 					getTexturePixelToVector3D(u, v, matDiffuse, rayBounceInfo.mat.textureMap, rayBounceInfo.mat.sizeMapX, rayBounceInfo.mat.sizeMapY);
 				}

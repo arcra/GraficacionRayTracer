@@ -97,8 +97,7 @@ void initScene()
 	matFloor.reflective = nullVector3D;
 	matFloor.shininess = 0.3f;
 	matFloor.textureMap = readBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
-	matFloor.bumpMap = readBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
-
+	//matFloor.bumpMap = readBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 
 	Material matLeft;
 	matLeft.diffuse.x = 0.0f;
@@ -193,25 +192,23 @@ void initScene()
 	Vector3D v7( 40.0f, 80.0f,-40.0f);
 	Vector3D v8(-40.0f, 80.0f,-40.0f);
 
-	//getFloor(matfloor1, matfloor2, rayTracer->surfaces,-40,-40,40,40,10.0);
-
 	TriangleFace *plane1 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v3, 0.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), matFloor);
 	TriangleFace *plane2 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), Vertex(v1, 1.0f, 1.0f), matFloor);
 
-	TriangleFace *plane3 = new TriangleFace(Vertex(v4), Vertex(v3), Vertex(v5), matLeft);
-	TriangleFace *plane4 = new TriangleFace(Vertex(v5), Vertex(v3), Vertex(v8), matLeft);
+	TriangleFace *plane3 = new TriangleFace(Vertex(v4), Vertex(v3), Vertex(v8), matLeft);
+	TriangleFace *plane4 = new TriangleFace(Vertex(v5), Vertex(v4), Vertex(v8), matLeft);
 
-	TriangleFace *plane5 = new TriangleFace(Vertex(v3), Vertex(v2), Vertex(v8), matBack);
-	TriangleFace *plane6 = new TriangleFace(Vertex(v2), Vertex(v7), Vertex(v8), matBack);
+	TriangleFace *plane5 = new TriangleFace(Vertex(v3), Vertex(v7), Vertex(v8), matBack);
+	TriangleFace *plane6 = new TriangleFace(Vertex(v2), Vertex(v7), Vertex(v3), matBack);
 
-	TriangleFace *plane7 = new TriangleFace(Vertex(v2), Vertex(v1), Vertex(v6), matRight);
-	TriangleFace *plane8 = new TriangleFace(Vertex(v2), Vertex(v6), Vertex(v7), matRight);
+	TriangleFace *plane7 = new TriangleFace(Vertex(v7), Vertex(v2), Vertex(v6), matRight);
+	TriangleFace *plane8 = new TriangleFace(Vertex(v6), Vertex(v2), Vertex(v1), matRight);
 
 	TriangleFace *plane9 = new TriangleFace(Vertex(v8), Vertex(v7), Vertex(v6), matTop);
 	TriangleFace *plane10 = new TriangleFace(Vertex(v8), Vertex(v6), Vertex(v5), matTop);
 
-	TriangleFace *plane11 = new TriangleFace(Vertex(v4), Vertex(v5), Vertex(v6), matFront);
-	TriangleFace *plane12 = new TriangleFace(Vertex(v4), Vertex(v6), Vertex(v1), matFront);
+	TriangleFace *plane11 = new TriangleFace(Vertex(v5), Vertex(v6), Vertex(v1), matFront);
+	TriangleFace *plane12 = new TriangleFace(Vertex(v5), Vertex(v1), Vertex(v4), matFront);
 
 	float offsetX1,offsetX2,
 	    offsetY1,offsetY2,

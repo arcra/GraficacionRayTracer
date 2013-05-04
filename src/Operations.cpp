@@ -215,7 +215,7 @@ void getTexturePixelToVector3D(int i, int j, Vector3D& component, unsigned char 
   else
     j = j % sizeY;
 
-  unsigned int ind = (j * sizeX * 3) + (i*3);
+  unsigned int ind = (j * sizeX + i)*3;
 
   component.x = textureBuffer[ind]/255.0f;
   component.y = textureBuffer[ind+1]/255.0f;

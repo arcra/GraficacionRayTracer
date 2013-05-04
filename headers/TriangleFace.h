@@ -26,6 +26,8 @@ namespace RayTracing {
 			virtual Vector3D computeNormal(Vector3D point);
 			virtual void applyTransformation(float** m);
 			virtual void getTextureCoords(Vector3D point, int& u, int& v);
+
+			virtual ~TriangleFace();
 	};
 
 } /* namespace RayTracing */

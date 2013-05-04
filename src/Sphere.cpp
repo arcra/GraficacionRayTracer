@@ -9,6 +9,7 @@
 #include "Operations.h"
 #include <cmath>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -70,5 +71,14 @@ namespace RayTracing
 	void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
 	{
 
+	}
+
+	Sphere::~Sphere()
+	{
+		if(mat.textureMap)
+			free(mat.textureMap);
+
+		if(mat.bumpMap)
+			free(mat.bumpMap);
 	}
 }

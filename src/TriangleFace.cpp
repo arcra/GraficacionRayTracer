@@ -8,6 +8,7 @@
 #include "TriangleFace.h"
 #include "Operations.h"
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -18,6 +19,8 @@ TriangleFace::TriangleFace(Vertex v1, Vertex v2, Vertex v3) : v1(v1.position), v
 	this->v1 = Vertex(v1);
 	this->v2 = v2;
 	this->v3 = v3;
+
+	this->normal = ((v2.position - v1.position).crossProuct(v3.position - v1.position)).getNormal();
 }
 
 TriangleFace::TriangleFace(Vertex v1, Vertex v2, Vertex v3, Material m) : v1(v1.position), v2(v2.position), v3(v3.position) {
@@ -26,6 +29,8 @@ TriangleFace::TriangleFace(Vertex v1, Vertex v2, Vertex v3, Material m) : v1(v1.
 	this->v2 = v2;
 	this->v3 = v3;
 	this->mat = m;
+
+	this->normal = ((v2.position - v1.position).crossProuct(v3.position - v1.position)).getNormal();
 }
 
 bool TriangleFace::isSurfaceHit(ray r, float& t)
@@ -85,7 +90,6 @@ bool TriangleFace::isSurfaceHit(ray r, float& t)
 
 Vector3D TriangleFace::computeNormal(Vector3D point)
 {
-	normal = ((v2.position - v1.position).crossProuct(v3.position - v1.position)).getNormal();
 	return normal;
 }
 
@@ -119,20 +123,64 @@ void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
 		vert3 = v1;
 	}
 
+	bool print = false;
+	if(point.y == 0.0f && point.x > -5.1f && point.x < -4.9f)
+	{
+		print = true;
+//		u = 0;
+//		v = 0;
+//		return;
+	}
+
+	Vector3D pointVector = point - vert1.position;
 	Vector3D axisVector = (vert3.position - vert1.position);
-	Vector3D projectedVector = (point - vert1.position).dotProduct(axisVector)*axisVector;
+	Vector3D normalizedAxisVector = axisVector.getNormal();
+	float scaling = pointVector.dotProduct(axisVector)/axisVector.getMagnitude();
+	Vector3D projectedVector = scaling*normalizedAxisVector;
 
-	cout << "point: " << (point - vert1.position) << endl;
-	cout << "axis: " << axisVector << endl;
-	cout << "proj: " << projectedVector << endl;
+	float tu = vert1.tu + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert3.tu - vert1.tu);
+	u = (int)round(tu*mat.sizeMapX, 0);
 
-	u = (int)round((vert1.tu + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert3.tu - vert1.tu))*mat.sizeMapX, 0);
+//	if(print)
+//	{
+//		cout << "axis: " << axisVector << endl;
+//		cout << "proj: " << projectedVector << endl;
+//		cout << "v1.tu: " << vert1.tu << endl;
+//		cout << "tu: " << tu << endl;
+//		cout << "u: " << u << endl;
+//	}
 
 	axisVector = (vert3.position - vert1.position).crossProuct(computeNormal(point));
-	axisVector = (vert2.position - vert1.position).dotProduct(axisVector)*axisVector;
-	projectedVector = (point - vert1.position).dotProduct(axisVector)*axisVector;
+	normalizedAxisVector = axisVector.getNormal();
+	scaling = (vert2.position - vert1.position).dotProduct(axisVector)/axisVector.getMagnitude();
 
-	v = (int)round((vert1.tv + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert2.tv - vert1.tv))*mat.sizeMapY, 0);
+	axisVector = scaling*normalizedAxisVector;
+	normalizedAxisVector = axisVector.getNormal();
+	scaling = pointVector.dotProduct(axisVector)/axisVector.getMagnitude();
+	projectedVector = scaling*normalizedAxisVector;
+
+
+	float tv = vert1.tv + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert2.tv - vert1.tv);
+	v = (int)round(tv*mat.sizeMapY, 0);
+
+//	if(print)
+//	{
+//		cout << "axis: " << axisVector << endl;
+//		cout << "proj: " << projectedVector << endl;
+//		cout << "v1.tv: " << vert1.tv << endl;
+//		cout << "tv: " << tv << endl;
+//		cout << "v: " << v << endl;
+//	}
+
+}
+
+TriangleFace::~TriangleFace()
+{
+	if(mat.textureMap)
+		free(mat.textureMap);
+
+	if(mat.bumpMap)
+		free(mat.bumpMap);
 }
 
 } /* namespace RayTracing */
