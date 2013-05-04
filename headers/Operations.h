@@ -5,7 +5,7 @@
 
 using namespace GL;
 
-void multMatrixVector3D(float** m, const Vector3D& a, Vector3D& r);
+void multMatrixVector3D(float** m, const Vector3D a, Vector3D& r);
 void multMatrix4Matrix4(float** a, float** b, float** r);
 void matrixTranspose(float **m, float **t, int size);
 float** getRotationMatrix(float angle_x, float angle_y, float angle_z);

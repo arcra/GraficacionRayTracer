@@ -33,6 +33,8 @@ public:
 	void rotate(float angle_x, float angle_y, float angle_z);
 	void scale(float sx, float sy, float sz);
 	void translate(float tx, float ty, float tz);
+	void pushMatrix();
+	void popMatrix();
 
 	~RayTracer();
 
@@ -41,12 +43,9 @@ protected:
 	unsigned int width;
 	unsigned int height;
 	unsigned char *rgbBuffer;
-	float** transgormationMatrix;
+	float** transformationMatrix;
 	stack<float**> matrixStack;
 	vector<ISurface*> surfaces;
-
-	void pushMatrix();
-	void popMatrix();
 
 	bool pathToLightIsClear(Vector3D point, Vector3D lightPosition);
 	bool findClosestIntersection(ray& currentRay, float& minT, unsigned int& surfaceIndex);

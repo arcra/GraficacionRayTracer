@@ -6,11 +6,34 @@
 
 using namespace GL;
 
-typedef struct
+typedef struct Vertex
+{
+	Vector3D position;
+	float tu, tv;
+
+	Vertex(Vector3D pos, float u = 0.0f, float v = 0.0f)
+	{
+		this->position = pos;
+		this->tu = u;
+		this->tv = v;
+	}
+
+}Vertex;
+
+typedef struct Material
 {
   Vector3D diffuse, specular, reflective;
+  unsigned char *textureMap, *bumpMap;
+  int sizeMapX, sizeMapY;
   float shininess;
-}material;
+
+  Material()
+  {
+	  this->textureMap = NULL;
+	  this->bumpMap = NULL;
+  }
+
+}Material;
 
 typedef struct
 {
@@ -24,7 +47,7 @@ typedef struct
 {
 	Vector3D point;
 	Vector3D normal;
-	material mat;
+	Material mat;
 }rayBounce;
 
 typedef struct

@@ -63,13 +63,12 @@ void RayTracer::addLight(float x, float y, float z, float r, float g, float b)
 
 void RayTracer::addSurface(ISurface* surf)
 {
-	surf->applyTransformation(this->transgormationMatrix);
+	surf->applyTransformation(this->transformationMatrix);
 	this->surfaces.push_back(surf);
 }
 
 void RayTracer::renderScence()
 {
-
 	unsigned int i, j, k, surfaceIndex;
 	ray currentRay;
 	rayBounce rayBounceInfo;
@@ -83,7 +82,6 @@ void RayTracer::renderScence()
 	{
 		for(i = 0; i < width; i++)
 		{
-
 			us = camera->left + (camera->right - camera->left) * i/width;
 			vs = camera->bottom + (camera->top - camera->bottom) * j/height;
 
@@ -92,16 +90,25 @@ void RayTracer::renderScence()
 			currentRay.e = camera->position;
 			currentRay.s = Vector3D(us, vs, ws);
 			if(currentRay.e.x == currentRay.s.x && currentRay.e.y == currentRay.s.y && currentRay.e.z == currentRay.s.z)
-			{
 				continue;
-			}
 			currentRay.lifeSpan = 1.0;
 			stack<rayBounce> bounceStack;
 
 			if(!findClosestIntersection(currentRay, minT, surfaceIndex))
 				continue;
 
-			ambient = surfaces[surfaceIndex]->mat.diffuse;
+			Vector3D matDiffuse;
+			if(surfaces[surfaceIndex]->mat.textureMap)
+			{
+				matDiffuse
+				//Vector3D matDiffuse = map.text;
+			}
+			else
+			{
+				matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
+			}
+
+			ambient = matDiffuse;
 
 			rayBounceInfo.point = currentRay.e + minT*(currentRay.s - currentRay.e);
 			rayBounceInfo.point.x = round(rayBounceInfo.point.x, 4);
@@ -239,25 +246,25 @@ void  RayTracer::loadIdentity()
 		}
 	}
 	this->matrixStack.push(temp);
-	this->transgormationMatrix = this->matrixStack.top();
+	this->transformationMatrix = this->matrixStack.top();
 }
 
 void RayTracer::rotate(float angle_x, float angle_y, float angle_z)
 {
 	float** rotationMatrix = getRotationMatrix(angle_x, angle_y, angle_z);
-	multMatrix4Matrix4(rotationMatrix, this->transgormationMatrix, this->transgormationMatrix);
+	multMatrix4Matrix4(rotationMatrix, this->transformationMatrix, this->transformationMatrix);
 }
 
 void RayTracer::scale(float sx, float sy, float sz)
 {
 	float** scalingMatrix = getScalingMatrix(sx, sy, sz);
-	multMatrix4Matrix4(scalingMatrix, this->transgormationMatrix, this->transgormationMatrix);
+	multMatrix4Matrix4(scalingMatrix, this->transformationMatrix, this->transformationMatrix);
 }
 
 void RayTracer::translate(float tx, float ty, float tz)
 {
 	float** translationMatrix = getTranslationMatrix(tx, ty, tz);
-	multMatrix4Matrix4(translationMatrix, this->transgormationMatrix, this->transgormationMatrix);
+	multMatrix4Matrix4(translationMatrix, this->transformationMatrix, this->transformationMatrix);
 }
 
 void RayTracer::pushMatrix()
@@ -270,22 +277,25 @@ void RayTracer::pushMatrix()
 	{
 		m[i] = (float*)malloc(4*sizeof(float));
 		for(j = 0; j < 4; j++)
-			m[i][j] = this->transgormationMatrix[i][j];
+			m[i][j] = this->transformationMatrix[i][j];
 	}
 	this->matrixStack.push(m);
 }
 
 void RayTracer::popMatrix()
 {
-	int i;
+	int i, j;
 	float** temp;
 	temp = this->matrixStack.top();
 	this->matrixStack.pop();
+
+	for(i = 0; i < 4; i++)
+		for(j = 0; j < 4; j++)
+			this->transformationMatrix[i][j] = temp[i][j];
+
 	for(i = 0; i < 4; i++)
 		free(temp[i]);
 	free(temp);
-
-	this->transgormationMatrix = this->matrixStack.top();
 }
 
 
@@ -316,7 +326,7 @@ bool RayTracer::findClosestIntersection(ray& currentRay, float& minT, unsigned i
 			intersectionFound = true;
 			if(t < minT){
 				minT = t;
-				surfaceIndex  = l;
+				surfaceIndex = l;
 			}
 		}
 	}

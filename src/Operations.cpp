@@ -11,12 +11,13 @@
 using namespace std;
 
 
-void multMatrixVector3D(float** m, const Vector3D& a, Vector3D& r)
+void multMatrixVector3D(float** m, const Vector3D a, Vector3D& r)
 {
   Vector3D temp = a;
-  r.x = m[0][0] * temp.x + m[0][1] * temp.y + m[0][2] * temp.z;
-  r.y = m[1][0] * temp.x + m[1][1] * temp.y + m[1][2] * temp.z;
-  r.z = m[2][0] * temp.x + m[2][1] * temp.y + m[2][2] * temp.z;
+  r.x = m[0][0] * temp.x + m[0][1] * temp.y + m[0][2] * temp.z + m[0][3] * temp.w;
+  r.y = m[1][0] * temp.x + m[1][1] * temp.y + m[1][2] * temp.z + m[1][3] * temp.w;
+  r.z = m[2][0] * temp.x + m[2][1] * temp.y + m[2][2] * temp.z + m[2][3] * temp.w;
+  r.w = m[3][0] * temp.x + m[3][1] * temp.y + m[3][2] * temp.z + m[3][3] * temp.w;
 }
 
 void multMatrix4Matrix4(float** a, float** b, float** r)
@@ -140,6 +141,13 @@ float** getTranslationMatrix(float tx, float ty, float tz){
 		}
 	}
 
+//	for(i = 0; i < 4; i++)
+//	{
+//		for(j = 0; j < 4; j++)
+//			cout << translation[i][j] << "\t";
+//		cout << endl;
+//	}
+
 	return translation;
 
 }
@@ -162,7 +170,7 @@ float** getScalingMatrix(float sx, float sy, float sz){
 
 unsigned char* readBMP(char* filename, int &sizeX, int &sizeY)
 {
-  cout << filename << endl;
+  //cout << filename << endl;
   int i;
   FILE* f = fopen(filename, "rb");
     
@@ -191,8 +199,29 @@ unsigned char* readBMP(char* filename, int &sizeX, int &sizeY)
       data[i+2] = tmp;
     }
 
-  cout << filename << endl;
+  //cout << filename << endl;
   return data;
+}
+
+void getTexturePixelToVector3D(int i, int j, Vector3D& component, unsigned char *textureBuffer, int sizeX, int sizeY)
+{
+  if (i < 0)
+    i = sizeX - 1 - (-i) % sizeX;
+  else
+    i = i % sizeX;
+
+  if (j < 0)
+    j = sizeY - 1 - (-j) % sizeY;
+  else
+    j = j % sizeY;
+
+  unsigned int ind = (j * sizeX * 3) + (i*3);
+
+  component.x = textureBuffer[ind]/255.0f;
+  component.y = textureBuffer[ind+1]/255.0f;
+  component.z = textureBuffer[ind+2]/255.0f;
+
+  //  cout << rgb[0]*1 << " " << rgb[1]*1 << " " << rgb[2]*1 <<endl;
 }
 
 float round(float num, unsigned char decimals){

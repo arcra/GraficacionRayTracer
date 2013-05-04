@@ -15,16 +15,17 @@ namespace RayTracing {
 	class TriangleFace: public RayTracing::ISurface {
 		public:
 
-			Vector3D v1;
-			Vector3D v2;
-			Vector3D v3;
+			Vertex v1;
+			Vertex v2;
+			Vertex v3;
 
-			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3);
-			TriangleFace(Vector3D v1, Vector3D v2, Vector3D v3, material m);
+			TriangleFace(Vertex v1, Vertex v2, Vertex v3);
+			TriangleFace(Vertex v1, Vertex v2, Vertex v3, Material m);
 
 			virtual bool isSurfaceHit(ray r, float& t);
 			virtual Vector3D computeNormal(Vector3D point);
 			virtual void applyTransformation(float** m);
+			virtual void getTextureCoords(Vector3D point, int& u, int& v);
 	};
 
 } /* namespace RayTracing */

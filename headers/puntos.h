@@ -6,8 +6,8 @@
 
 
 using namespace RayTracing;
-void getSurfaces(material mat, std::vector<ISurface*> &sur,float offsetX,float offsetY,float offsetZ);
+void getSurfaces(Material mat, std::vector<ISurface*> &sur,float offsetX,float offsetY,float offsetZ);
 
-void getFloor(material mat, material mat2,std::vector<ISurface*> &sur,float xmin, float zmin, float xmax, float zmax,float nMos);
+void getFloor(Material mat, Material mat2,std::vector<ISurface*> &sur,float xmin, float zmin, float xmax, float zmax,float nMos);
 
 #endif

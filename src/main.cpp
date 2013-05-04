@@ -1,4 +1,6 @@
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
+#include <gdk/gdkdrawable.h>
 #include <glib/gtypes.h>
 #include <iostream>
 #include <cstdlib>
@@ -6,7 +8,7 @@
 #include "Vector3D.h"
 #include "RayTracer.h"
 #include "Surfaces.h"
-#include "puntos.h"
+//#include "puntos.h"
 
 #define IMAGE_WIDTH 700
 #define IMAGE_HEIGHT 700
@@ -22,6 +24,8 @@ void initScene();
 gboolean on_darea_expose (GtkWidget *widget,GdkEventExpose *event,gpointer user_data);
 
 void initWindow(int argc, char *argv[]);
+
+void addCube(float size, Material mat);
 
 
 int main(int argc, char* argv[])
@@ -76,7 +80,7 @@ void initScene()
 	Vector3D fullVector3D(1.0f, 1.0f, 1.0f);
 
 
-	material matTable;
+	Material matTable;
 	matTable.diffuse.x = 0.63f;
 	matTable.diffuse.y = 0.32f;
 	matTable.diffuse.z = 0.18f;
@@ -84,29 +88,19 @@ void initScene()
 	matTable.reflective = nullVector3D;
 	matTable.shininess = 1.0f;
 
-	material matfloor1;
-	matfloor1.diffuse.x = 0.0f;
-	matfloor1.diffuse.y = 0.0f;
-	matfloor1.diffuse.z = 0.0f;
-	Vector3D specularF1(1.0f,1.0f,1.0f);
-	matfloor1.specular = specularF1;
-	Vector3D reflectiveF1(0.2f,0.2f,0.2f);
-//	matfloor1.reflective = reflectiveF1;
-	matfloor1.reflective = nullVector3D;
-	matfloor1.shininess = 0.3f;
-
-	material matfloor2;
-	matfloor2.diffuse.x = 1.0f;
-	matfloor2.diffuse.y = 1.0f;
-	matfloor2.diffuse.z = 1.0f;
-	Vector3D specularF2(1.0f,1.0f,1.0f);
-	matfloor2.specular = specularF1;
-//	Vector3D reflectiveF2(0.5f,0.5f,0.5f);
-	matfloor2.reflective = nullVector3D;
-	matfloor2.shininess = 0.3f;
+	Material matFloor;
+	matFloor.diffuse.x = 0.8f;
+	matFloor.diffuse.y = 0.8f;
+	matFloor.diffuse.z = 0.8f;
+	//matFloor.specular = Vector3D(1.0f,1.0f,1.0f);
+	matFloor.specular = nullVector3D;
+	matFloor.reflective = nullVector3D;
+	matFloor.shininess = 0.3f;
+	matFloor.textureMap = readBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+	matFloor.bumpMap = readBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 
 
-	material matLeft;
+	Material matLeft;
 	matLeft.diffuse.x = 0.0f;
 	matLeft.diffuse.y = 0.0f;
 	matLeft.diffuse.z = 1.0f;
@@ -114,9 +108,7 @@ void initScene()
 	matLeft.reflective = nullVector3D;
 	matLeft.shininess = 0.1f;
 
-
-
-	material matBack;
+	Material matBack;
 	matBack.diffuse.x = 1.0f;
 	matBack.diffuse.y = 1.0f;
 	matBack.diffuse.z = 1.0f;
@@ -124,8 +116,7 @@ void initScene()
 	matBack.reflective = nullVector3D;
 	matBack.shininess = 0.02f;
 
-
-	material matFront;
+	Material matFront;
 	matFront.diffuse.x = 0.0f;
 	matFront.diffuse.y = 1.0f;
 	matFront.diffuse.z = 0.0f;
@@ -133,9 +124,7 @@ void initScene()
 	matFront.reflective = nullVector3D;
 	matFront.shininess = 1.0f;
 
-
-
-	material matRight;
+	Material matRight;
 	matRight.diffuse.x = 1.0f;
 	matRight.diffuse.y = 0.0f;
 	matRight.diffuse.z = 0.0f;
@@ -143,9 +132,7 @@ void initScene()
 	matRight.reflective = nullVector3D;
 	matRight.shininess = 0.1f;
 
-
-
-	material matTop;
+	Material matTop;
 	matTop.diffuse.x = 0.4f;
 	matTop.diffuse.y = 0.2f;
 	matTop.diffuse.z = 0.3f;
@@ -153,7 +140,7 @@ void initScene()
 	matTop.reflective = nullVector3D;
 	matTop.shininess = 0.1f;
 
-	material matSp1;
+	Material matSp1;
 	matSp1.diffuse.x = 1.0f;
 	matSp1.diffuse.y = 0.85f;
 	matSp1.diffuse.z = 0.0f;
@@ -161,7 +148,7 @@ void initScene()
 	matSp1.reflective = medVector3D;
 	matSp1.shininess = 25.0f;
 
-	material matSp2;
+	Material matSp2;
 	matSp2.diffuse.x = 0.6f;
 	matSp2.diffuse.y = 0.6f;
 	matSp2.diffuse.z = 0.6f;
@@ -169,7 +156,7 @@ void initScene()
 	matSp2.reflective = fullVector3D;
 	matSp2.shininess = 25.0f;
 
-	material matSp3;
+	Material matSp3;
 	matSp3.diffuse.x = 1.0f;
 	matSp3.diffuse.y = 1.0f;
 	matSp3.diffuse.z = 1.0f;
@@ -183,6 +170,19 @@ void initScene()
 	Vector3D v3bis(-80.0f, 0.0f,-80.0f);
 	Vector3D v4bis(-80.0f, 0.0f, 80.0f);
 
+
+	/*
+	     8------------7
+		/|           /|
+	   / |          / |
+	  5------------6  |
+	  |  3---------|--2
+	  | /          | /
+	  |/           |/
+	  4----------- 1
+	*/
+
+
 	Vector3D v1( 40.0f, 0.0f, 40.0f);
 	Vector3D v2( 40.0f, 0.0f,-40.0f);
 	Vector3D v3(-40.0f, 0.0f,-40.0f);
@@ -195,20 +195,23 @@ void initScene()
 
 	//getFloor(matfloor1, matfloor2, rayTracer->surfaces,-40,-40,40,40,10.0);
 
-	TriangleFace *plane3 = new TriangleFace(v4,v3,v5,matLeft);
-	TriangleFace *plane4 = new TriangleFace(v5,v3,v8,matLeft);
+	TriangleFace *plane1 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v3, 0.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), matFloor);
+	TriangleFace *plane2 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), Vertex(v1, 1.0f, 1.0f), matFloor);
 
-	TriangleFace *plane5 = new TriangleFace(v3,v2,v8,matBack);
-	TriangleFace *plane6 = new TriangleFace(v2,v7,v8,matBack);
+	TriangleFace *plane3 = new TriangleFace(Vertex(v4), Vertex(v3), Vertex(v5), matLeft);
+	TriangleFace *plane4 = new TriangleFace(Vertex(v5), Vertex(v3), Vertex(v8), matLeft);
 
-	TriangleFace *plane7 = new TriangleFace(v2,v1,v6,matRight);
-	TriangleFace *plane8 = new TriangleFace(v2,v6,v7,matRight);
+	TriangleFace *plane5 = new TriangleFace(Vertex(v3), Vertex(v2), Vertex(v8), matBack);
+	TriangleFace *plane6 = new TriangleFace(Vertex(v2), Vertex(v7), Vertex(v8), matBack);
 
-	TriangleFace *plane9 = new TriangleFace(v8,v7,v6,matTop);
-	TriangleFace *plane10 = new TriangleFace(v8,v6,v5,matTop);
+	TriangleFace *plane7 = new TriangleFace(Vertex(v2), Vertex(v1), Vertex(v6), matRight);
+	TriangleFace *plane8 = new TriangleFace(Vertex(v2), Vertex(v6), Vertex(v7), matRight);
 
-	TriangleFace *plane11 = new TriangleFace(v4,v5,v6,matFront);
-	TriangleFace *plane12 = new TriangleFace(v4,v6,v1,matFront);
+	TriangleFace *plane9 = new TriangleFace(Vertex(v8), Vertex(v7), Vertex(v6), matTop);
+	TriangleFace *plane10 = new TriangleFace(Vertex(v8), Vertex(v6), Vertex(v5), matTop);
+
+	TriangleFace *plane11 = new TriangleFace(Vertex(v4), Vertex(v5), Vertex(v6), matFront);
+	TriangleFace *plane12 = new TriangleFace(Vertex(v4), Vertex(v6), Vertex(v1), matFront);
 
 	float offsetX1,offsetX2,
 	    offsetY1,offsetY2,
@@ -236,13 +239,24 @@ void initScene()
 	Sphere *sphere2 = new Sphere(radio,sphpos2+offsetM2+centroMesa2,matSp2);
 	Sphere *sphere3 = new Sphere(0.5f,sphpos3,matSp3);
 
+	rayTracer->pushMatrix();
 
+		rayTracer->scale(15.0, 2.0, 25.0);
+		rayTracer->rotate(0.0f, 45.0f, 0.0f);
+		rayTracer->translate(-10.0, 15.0, 5.0);
+
+		addCube(1.0f, matTable);
+
+	rayTracer->popMatrix();
+
+	rayTracer->addSurface(plane1);
+	rayTracer->addSurface(plane2);
+	rayTracer->addSurface(plane3);
+	rayTracer->addSurface(plane4);
 	rayTracer->addSurface(plane5);
 	rayTracer->addSurface(plane6);
 	rayTracer->addSurface(plane7);
 	rayTracer->addSurface(plane8);
-	rayTracer->addSurface(plane3);
-	rayTracer->addSurface(plane4);
 	rayTracer->addSurface(plane9);
 	rayTracer->addSurface(plane10);
 	rayTracer->addSurface(plane11);
@@ -251,10 +265,42 @@ void initScene()
 	rayTracer->addSurface(sphere2);
 	rayTracer->addSurface(sphere3);
 
+
 }
 
+void addCube(float size, Material mat)
+{
+	Vector3D v1( size/2.0f, -size/2.0f, size/2.0f);
+	Vector3D v2( size/2.0f, -size/2.0f,-size/2.0f);
+	Vector3D v3(-size/2.0f, -size/2.0f,-size/2.0f);
+	Vector3D v4(-size/2.0f, -size/2.0f, size/2.0f);
+
+	Vector3D v5(-size/2.0f, size/2.0f, size/2.0f);
+	Vector3D v6( size/2.0f, size/2.0f, size/2.0f);
+	Vector3D v7( size/2.0f, size/2.0f,-size/2.0f);
+	Vector3D v8(-size/2.0f, size/2.0f,-size/2.0f);
+
+	rayTracer->addSurface(new TriangleFace(v4,v3,v2,mat));
+
+	rayTracer->addSurface(new TriangleFace(v1,v4,v2,mat));
+
+	rayTracer->addSurface(new TriangleFace(v5,v3,v4,mat));
+	rayTracer->addSurface(new TriangleFace(v8,v3,v5,mat));
+
+	rayTracer->addSurface(new TriangleFace(v8,v2,v3,mat));
+	rayTracer->addSurface(new TriangleFace(v8,v7,v2,mat));
+
+	rayTracer->addSurface(new TriangleFace(v6,v1,v2,mat));
+	rayTracer->addSurface(new TriangleFace(v7,v6,v2,mat));
+
+	rayTracer->addSurface(new TriangleFace(v6,v7,v8,mat));
+	rayTracer->addSurface(new TriangleFace(v5,v6,v8,mat));
+
+	rayTracer->addSurface(new TriangleFace(v6,v5,v4,mat));
+	rayTracer->addSurface(new TriangleFace(v1,v6,v4,mat));
 
 
+}
 
 void initWindow(int argc, char *argv[]){
 

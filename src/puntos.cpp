@@ -110,7 +110,7 @@ float centroPisoHabitacion[1][3] = {0, 0, 0};
 */
 
 //vector<Surface> getSurfaces(material mat)
-void getSurfaces(material mat, vector<ISurface*> &sur,float offsetX, float offsetY, float offsetZ)
+void getSurfaces(Material mat, vector<ISurface*> &sur,float offsetX, float offsetY, float offsetZ)
 {
 
   //vector<Surface> sur;
@@ -275,7 +275,7 @@ TriangleFace *s2 = new TriangleFace(v4,v5,v6,mat);
 
 }
 
-void getFloor(material mat1, material mat2, std::vector<ISurface*> &sur, float xmin, float zmin, float xmax, float zmax, float nMos)
+void getFloor(Material mat1, Material mat2, std::vector<ISurface*> &sur, float xmin, float zmin, float xmax, float zmax, float nMos)
 {
   if(nMos <= 0.0)
     {

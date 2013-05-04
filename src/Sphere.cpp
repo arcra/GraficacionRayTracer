@@ -23,7 +23,7 @@ namespace RayTracing
 		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
-	Sphere::Sphere(float radius, Vector3D center, material m)  : ISurface()
+	Sphere::Sphere(float radius, Vector3D center, Material m)  : ISurface()
 	{
 
 		this->radius = radius;
@@ -67,4 +67,8 @@ namespace RayTracing
 		multMatrixVector3D(m, this->origin, this->origin);
 	}
 
+	virtual void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
+	{
+
+	}
 }
