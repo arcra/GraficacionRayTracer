@@ -220,7 +220,6 @@ void getTexturePixelToVector3D(int i, int j, Vector3D& component, unsigned char 
   component.x = textureBuffer[ind]/255.0f;
   component.y = textureBuffer[ind+1]/255.0f;
   component.z = textureBuffer[ind+2]/255.0f;
-
   //  cout << rgb[0]*1 << " " << rgb[1]*1 << " " << rgb[2]*1 <<endl;
 }
 

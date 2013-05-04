@@ -67,7 +67,7 @@ namespace RayTracing
 		multMatrixVector3D(m, this->origin, this->origin);
 	}
 
-	virtual void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
+	void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
 	{
 
 	}

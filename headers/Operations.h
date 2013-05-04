@@ -12,6 +12,7 @@ float** getRotationMatrix(float angle_x, float angle_y, float angle_z);
 float** getTranslationMatrix(float tx, float ty, float tz);
 float** getScalingMatrix(float sx, float sy, float sz);
 unsigned char* readBMP(char* filename, int &sizeX, int &sizeY);
+void getTexturePixelToVector3D(int i, int j, Vector3D& component, unsigned char *textureBuffer, int sizeX, int sizeY);
 float round(float number, unsigned char decimals=0);
 
 #endif

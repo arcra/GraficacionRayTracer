@@ -48,6 +48,7 @@ typedef struct
 	Vector3D point;
 	Vector3D normal;
 	Material mat;
+	int surfaceIndex;
 }rayBounce;
 
 typedef struct

@@ -96,9 +96,43 @@ void TriangleFace::applyTransformation(float** m)
 	multMatrixVector3D(m, this->v3.position, this->v3.position);
 }
 
-virtual void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
+void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
 {
+	Vertex vert1(v1);
+	Vertex vert2(v2);
+	Vertex vert3(v3);
 
+	float magA = (v2.position - v1.position).getMagnitude();
+	float magB = (v3.position - v1.position).getMagnitude();
+	float magC = (v3.position - v2.position).getMagnitude();
+
+	if(magA >= magB && magA >= magC)
+	{
+		vert1 = v3;
+		vert2 = v1;
+		vert3 = v2;
+	}
+	else if(magB >= magA && magB >= magC)
+	{
+		vert1 = v2;
+		vert2 = v3;
+		vert3 = v1;
+	}
+
+	Vector3D axisVector = (vert3.position - vert1.position);
+	Vector3D projectedVector = (point - vert1.position).dotProduct(axisVector)*axisVector;
+
+	cout << "point: " << (point - vert1.position) << endl;
+	cout << "axis: " << axisVector << endl;
+	cout << "proj: " << projectedVector << endl;
+
+	u = (int)round((vert1.tu + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert3.tu - vert1.tu))*mat.sizeMapX, 0);
+
+	axisVector = (vert3.position - vert1.position).crossProuct(computeNormal(point));
+	axisVector = (vert2.position - vert1.position).dotProduct(axisVector)*axisVector;
+	projectedVector = (point - vert1.position).dotProduct(axisVector)*axisVector;
+
+	v = (int)round((vert1.tv + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert2.tv - vert1.tv))*mat.sizeMapY, 0);
 }
 
 } /* namespace RayTracing */
