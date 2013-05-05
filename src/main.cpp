@@ -239,7 +239,7 @@ void initScene()
 	rayTracer->pushMatrix();
 
 		rayTracer->scale(15.0, 2.0, 25.0);
-		rayTracer->rotate(0.0f, 45.0f, 0.0f);
+		rayTracer->rotate(0.0f, 40.0f, 0.0f);
 		rayTracer->translate(-10.0, 15.0, 5.0);
 
 		addCube(1.0f, matTable);
@@ -267,19 +267,30 @@ void initScene()
 
 void addCube(float size, Material mat)
 {
-	Vector3D v1( size/2.0f, -size/2.0f, size/2.0f);
-	Vector3D v2( size/2.0f, -size/2.0f,-size/2.0f);
-	Vector3D v3(-size/2.0f, -size/2.0f,-size/2.0f);
-	Vector3D v4(-size/2.0f, -size/2.0f, size/2.0f);
+	float halfSize = size/2.0f;
+	/*
+		 8------------7
+		/|           /|
+	   / |          / |
+	  5------------6  |
+	  |  3---------|--2
+	  | /          | /
+	  |/           |/
+	  4----------- 1
+	*/
 
-	Vector3D v5(-size/2.0f, size/2.0f, size/2.0f);
-	Vector3D v6( size/2.0f, size/2.0f, size/2.0f);
-	Vector3D v7( size/2.0f, size/2.0f,-size/2.0f);
-	Vector3D v8(-size/2.0f, size/2.0f,-size/2.0f);
+	Vector3D v1( halfSize, -halfSize, halfSize);
+	Vector3D v2( halfSize, -halfSize,-halfSize);
+	Vector3D v3(-halfSize, -halfSize,-halfSize);
+	Vector3D v4(-halfSize, -halfSize, halfSize);
 
-	rayTracer->addSurface(new TriangleFace(v4,v3,v2,mat));
+	Vector3D v5(-halfSize, halfSize, halfSize);
+	Vector3D v6( halfSize, halfSize, halfSize);
+	Vector3D v7( halfSize, halfSize,-halfSize);
+	Vector3D v8(-halfSize, halfSize,-halfSize);
 
-	rayTracer->addSurface(new TriangleFace(v1,v4,v2,mat));
+	rayTracer->addSurface(new TriangleFace(v1,v3,v2,mat));
+	rayTracer->addSurface(new TriangleFace(v1,v4,v3,mat));
 
 	rayTracer->addSurface(new TriangleFace(v5,v3,v4,mat));
 	rayTracer->addSurface(new TriangleFace(v8,v3,v5,mat));
@@ -287,16 +298,14 @@ void addCube(float size, Material mat)
 	rayTracer->addSurface(new TriangleFace(v8,v2,v3,mat));
 	rayTracer->addSurface(new TriangleFace(v8,v7,v2,mat));
 
-	rayTracer->addSurface(new TriangleFace(v6,v1,v2,mat));
-	rayTracer->addSurface(new TriangleFace(v7,v6,v2,mat));
+	rayTracer->addSurface(new TriangleFace(v6,v1,v7,mat));
+	rayTracer->addSurface(new TriangleFace(v7,v1,v2,mat));
 
-	rayTracer->addSurface(new TriangleFace(v6,v7,v8,mat));
-	rayTracer->addSurface(new TriangleFace(v5,v6,v8,mat));
+	rayTracer->addSurface(new TriangleFace(v5,v7,v8,mat));
+	rayTracer->addSurface(new TriangleFace(v5,v6,v7,mat));
 
 	rayTracer->addSurface(new TriangleFace(v6,v5,v4,mat));
 	rayTracer->addSurface(new TriangleFace(v1,v6,v4,mat));
-
-
 }
 
 void initWindow(int argc, char *argv[]){

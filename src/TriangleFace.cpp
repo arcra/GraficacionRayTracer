@@ -80,7 +80,6 @@ bool TriangleFace::isSurfaceHit(ray r, float& t)
 		return false;
 
 	beta = (j*ei_minus_hf + k*gf_minus_di + l*dh_minus_eg)/M;
-	beta = round(beta, 6);
 
 	if(beta < 0 || beta > (1.0 -gamma))
 		return false;
@@ -98,6 +97,8 @@ void TriangleFace::applyTransformation(float** m)
 	multMatrixVector3D(m, this->v1.position, this->v1.position);
 	multMatrixVector3D(m, this->v2.position, this->v2.position);
 	multMatrixVector3D(m, this->v3.position, this->v3.position);
+
+	this->normal = ((v2.position - v1.position).crossProuct(v3.position - v1.position)).getNormal();
 }
 
 void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
@@ -123,15 +124,6 @@ void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
 		vert3 = v1;
 	}
 
-	bool print = false;
-	if(point.y == 0.0f && point.x > -5.1f && point.x < -4.9f)
-	{
-		print = true;
-//		u = 0;
-//		v = 0;
-//		return;
-	}
-
 	Vector3D pointVector = point - vert1.position;
 	Vector3D axisVector = (vert3.position - vert1.position);
 	Vector3D normalizedAxisVector = axisVector.getNormal();
@@ -140,15 +132,6 @@ void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
 
 	float tu = vert1.tu + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert3.tu - vert1.tu);
 	u = (int)round(tu*mat.sizeMapX, 0);
-
-//	if(print)
-//	{
-//		cout << "axis: " << axisVector << endl;
-//		cout << "proj: " << projectedVector << endl;
-//		cout << "v1.tu: " << vert1.tu << endl;
-//		cout << "tu: " << tu << endl;
-//		cout << "u: " << u << endl;
-//	}
 
 	axisVector = (vert3.position - vert1.position).crossProuct(computeNormal(point));
 	normalizedAxisVector = axisVector.getNormal();
@@ -162,15 +145,6 @@ void TriangleFace::getTextureCoords(Vector3D point, int& u, int& v)
 
 	float tv = vert1.tv + projectedVector.getMagnitude()/axisVector.getMagnitude()*(vert2.tv - vert1.tv);
 	v = (int)round(tv*mat.sizeMapY, 0);
-
-//	if(print)
-//	{
-//		cout << "axis: " << axisVector << endl;
-//		cout << "proj: " << projectedVector << endl;
-//		cout << "v1.tv: " << vert1.tv << endl;
-//		cout << "tv: " << tv << endl;
-//		cout << "v: " << v << endl;
-//	}
 
 }
 
