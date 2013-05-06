@@ -11,6 +11,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#define PI (3.141592653589793)
+
 using namespace std;
 
 namespace RayTracing
@@ -70,7 +72,31 @@ namespace RayTracing
 
 	void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
 	{
+		Vector3D planeProjection;
+		float oppSideMag;
+		float adySideMag;
 
+		Vector3D surfNormal = (this->computeNormal(point) - this->origin).getNormal();
+
+		planeProjection = surfNormal;
+		planeProjection.y = 0.0f;
+
+		oppSideMag = planeProjection.getMagnitude();
+		adySideMag = surfNormal.y;
+
+		float angleY = atan2(oppSideMag, adySideMag);
+
+
+		planeProjection = surfNormal;
+		planeProjection.x = 0.0f;
+
+		oppSideMag = planeProjection.getMagnitude();
+		adySideMag = surfNormal.x;
+
+		float angleX = atan2(oppSideMag, adySideMag);
+
+		u = (int)round(angleX*mat.sizeMapX/(2*PI), 0);
+		v = (int)round(angleY*mat.sizeMapY/PI, 0);
 	}
 
 	Sphere::~Sphere()

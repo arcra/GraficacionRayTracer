@@ -18,7 +18,6 @@ namespace RayTracing
 {
 	class ISurface {
 		public:
-			Vector3D normal;
 			Material mat;
 
 			virtual bool isSurfaceHit(const ray r, float& t) = 0;
@@ -26,6 +25,9 @@ namespace RayTracing
 			virtual void applyTransformation(float** m) = 0;
 			virtual void getTextureCoords(Vector3D point, int& u, int& v) = 0;
 			virtual ~ISurface() {}
+
+		protected:
+			Vector3D normal;
 	};
 }
 #endif /* ISURFACE_H_ */

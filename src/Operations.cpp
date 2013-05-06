@@ -168,59 +168,174 @@ float** getScalingMatrix(float sx, float sy, float sz){
 	return scaling;
 }
 
-unsigned char* readBMP(char* filename, int &sizeX, int &sizeY)
+unsigned char* readTextureFromBMP(char* filename, int &sizeX, int &sizeY)
 {
-  //cout << filename << endl;
-  int i;
-  FILE* f = fopen(filename, "rb");
-    
-  if(f == NULL){
-    sizeX = 512;
-    sizeY = 512;
-    return NULL;
-  }
-  unsigned char info[54];
-  fread(info, sizeof(unsigned char), 54, f); // read the 54-byte header
+	int i;
+	FILE* f = fopen(filename, "rb");
 
-  // extract image height and width from header
-  int width = *(int*)&info[18];
-  int height = *(int*)&info[22];
-  sizeX = width;
-  sizeY = height;
-  int size = 3 * width * height;
-  unsigned char* data = new unsigned char[size]; // allocate 3 bytes per pixel
-  fread(data, sizeof(unsigned char), size, f); // read the rest of the data at once
-  fclose(f);
+	if(f == NULL){
+		sizeX = 512;
+		sizeY = 512;
+		return NULL;
+	}
+	unsigned char info[54];
+	fread(info, sizeof(unsigned char), 54, f); // read the 54-byte header
 
-  for(i = 0; i < size; i += 3)
-    {
-      unsigned char tmp = data[i];
-      data[i] = data[i+2];
-      data[i+2] = tmp;
-    }
+	// extract image height and width from header
+	int width = *(int*)&info[18];
+	int height = *(int*)&info[22];
+	sizeX = width;
+	sizeY = height;
+	int size = 3 * width * height;
+	unsigned char* data = new unsigned char[size]; // allocate 3 bytes per pixel
+	fread(data, sizeof(unsigned char), size, f); // read the rest of the data at once
+	fclose(f);
 
-  //cout << filename << endl;
-  return data;
+	for(i = 0; i < size; i += 3)
+	{
+	  unsigned char tmp = data[i];
+	  data[i] = data[i+2];
+	  data[i+2] = tmp;
+	}
+
+	return data;
 }
 
-void getTexturePixelToVector3D(int i, int j, Vector3D& component, unsigned char *textureBuffer, int sizeX, int sizeY)
+unsigned char* readBumpMapFromBMP(char* filename, int &sizeX, int &sizeY)
 {
-  if (i < 0)
-    i = sizeX - 1 - (-i) % sizeX;
-  else
-    i = i % sizeX;
+	int i;
+	FILE* f = fopen(filename, "rb");
 
-  if (j < 0)
-    j = sizeY - 1 - (-j) % sizeY;
-  else
-    j = j % sizeY;
+	if(f == NULL){
+		sizeX = 512;
+		sizeY = 512;
+		return NULL;
+	}
+	unsigned char info[54];
+	fread(info, sizeof(unsigned char), 54, f); // read the 54-byte header
 
-  unsigned int ind = (j * sizeX + i)*3;
+	// extract image height and width from header
+	int width = *(int*)&info[18];
+	int height = *(int*)&info[22];
+	sizeX = width;
+	sizeY = height;
+	/*********************
+	 * Changing size for single channel
+	 *********************/
+	int size = width * height;
+	unsigned char* data = new unsigned char[3*size]; // allocate 3 bytes per pixel
+	fread(data, sizeof(unsigned char), 3*size, f); // read the rest of the data at once
+	fclose(f);
 
-  component.x = textureBuffer[ind]/255.0f;
-  component.y = textureBuffer[ind+1]/255.0f;
-  component.z = textureBuffer[ind+2]/255.0f;
-  //  cout << rgb[0]*1 << " " << rgb[1]*1 << " " << rgb[2]*1 <<endl;
+	unsigned char *oneChannelData = new unsigned char[size];
+
+	for(i = 0; i < size; i++)
+		oneChannelData[i] = data[3*i+1];
+
+	delete data;
+	return oneChannelData;
+}
+
+void getTexturePixelToVector3D(int u, int v, Vector3D& component, unsigned char *textureBuffer, int sizeX, int sizeY)
+{
+	if (u < 0)
+		u = sizeX - 1 - (-u) % sizeX;
+	else
+		u = u % sizeX;
+
+	if (v < 0)
+		v = sizeY - 1 - (-v) % sizeY;
+	else
+		v = v % sizeY;
+
+	unsigned int ind = (v * sizeX + u)*3;
+
+	component.x = textureBuffer[ind]/255.0f;
+	component.y = textureBuffer[ind+1]/255.0f;
+	component.z = textureBuffer[ind+2]/255.0f;
+}
+
+void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bumpMap, int sizeX, int sizeY, const Vector3D surfNormal)
+{
+	if (u < 0)
+		u = sizeX - 1 - (-u) % sizeX;
+	else
+		u = u % sizeX;
+
+	if (v < 0)
+		v = sizeY - 1 - (-v) % sizeY;
+	else
+		v = v % sizeY;
+
+	//Apply convolution and find gradient vector
+
+	char horizontalGradientMask[3][3] = {{-1, 0, 1},
+										{-2, 0, 2},
+										{-1, 0, 1}};
+
+	char verticalGradientMask[3][3] = {{-1, -2, -1},
+										{0, 0, 0},
+										{1, 2, 1}};
+	unsigned int i, j;
+	unsigned int ind;
+	int sumHorizontal = 0;
+	int sumVertical = 0;
+
+	for(i = -1; i < 2; i++)
+	{
+		for(j = -1; j < 2; j++)
+		{
+			if((u + i < 0 || v + j < 0) || (u +i >= sizeX || v+j >= sizeY))
+				continue;
+
+			ind = (v+j) * sizeX + u+i;
+			sumHorizontal += horizontalGradientMask[j+1][i+1]*bumpMap[ind];
+			sumVertical += verticalGradientMask[j+1][i+1]*bumpMap[ind];
+		}
+	}
+
+	component.x = (sumHorizontal/(4.0f*255))/sqrt(2.0);
+	component.y = (sumVertical/(4.0f*255))/sqrt(2.0);
+	component.z = 0.0f;
+
+	if(component.x != 0.0f || component.y != 0.0f || component.z != 0.0f)
+		cout << component << endl;
+
+	//Find normal rotation
+
+	Vector3D planeProjection;
+	float oppSideMag;
+	float adySideMag;
+
+	planeProjection = surfNormal;
+	planeProjection.y = 0.0f;
+
+	oppSideMag = planeProjection.getMagnitude();
+	adySideMag = surfNormal.y;
+
+	float angleY = atan2(oppSideMag, adySideMag)*180/PI;
+
+
+	planeProjection = surfNormal;
+	planeProjection.x = 0.0f;
+
+	oppSideMag = planeProjection.getMagnitude();
+	adySideMag = surfNormal.x;
+
+	float angleX = atan2(oppSideMag, adySideMag)*180/PI;
+
+	//rotate gradient vector
+	float **rotationMatrix = getRotationMatrix(angleX, angleY, 0.0f);
+
+	multMatrixVector3D(rotationMatrix, component, component);
+
+	for(i = 0; i < 4; i++)
+		free(rotationMatrix[i]);
+
+	free(rotationMatrix);
+	//Add both vectors and normalize
+
+	component = (component + surfNormal).getNormal();
 }
 
 float round(float num, unsigned char decimals){

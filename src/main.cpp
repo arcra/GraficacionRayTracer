@@ -96,8 +96,8 @@ void initScene()
 	matFloor.specular = nullVector3D;
 	matFloor.reflective = nullVector3D;
 	matFloor.shininess = 0.3f;
-	matFloor.textureMap = readBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
-	//matFloor.bumpMap = readBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+	matFloor.textureMap = readTextureFromBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+	matFloor.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 
 	Material matLeft;
 	matLeft.diffuse.x = 0.0f;
@@ -148,12 +148,17 @@ void initScene()
 	matSp1.shininess = 25.0f;
 
 	Material matSp2;
-	matSp2.diffuse.x = 0.6f;
-	matSp2.diffuse.y = 0.6f;
-	matSp2.diffuse.z = 0.6f;
+//	matSp2.diffuse.x = 0.6f;
+//	matSp2.diffuse.y = 0.6f;
+//	matSp2.diffuse.z = 0.6f;
+	matSp2.diffuse.x = 1.0f;
+	matSp2.diffuse.y = 1.0f;
+	matSp2.diffuse.z = 1.0f;
 	matSp2.specular = medVector3D;
-	matSp2.reflective = fullVector3D;
+//	matSp2.reflective = fullVector3D;
+	matSp2.reflective = nullVector3D;
 	matSp2.shininess = 25.0f;
+	matSp2.bumpMap = readBumpMapFromBMP("resources/test.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 
 	Material matSp3;
 	matSp3.diffuse.x = 1.0f;
