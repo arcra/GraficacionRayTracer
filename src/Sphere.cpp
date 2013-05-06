@@ -23,7 +23,7 @@ namespace RayTracing
 
 		this->radius = radius;
 		this->center = center;
-		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
+		this->origin = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
 	Sphere::Sphere(float radius, Vector3D center, Material m)  : ISurface()
@@ -32,7 +32,7 @@ namespace RayTracing
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
-		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
+		this->origin = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
 

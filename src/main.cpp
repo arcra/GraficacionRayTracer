@@ -158,7 +158,8 @@ void initScene()
 //	matSp2.reflective = fullVector3D;
 	matSp2.reflective = nullVector3D;
 	matSp2.shininess = 25.0f;
-	matSp2.bumpMap = readBumpMapFromBMP("resources/test.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+	matSp2.textureMap = readTextureFromBMP("resources/worldMap_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+	matSp2.bumpMap = readBumpMapFromBMP("resources/worldMap_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 
 	Material matSp3;
 	matSp3.diffuse.x = 1.0f;

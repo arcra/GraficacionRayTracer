@@ -276,7 +276,7 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 	char verticalGradientMask[3][3] = {{-1, -2, -1},
 										{0, 0, 0},
 										{1, 2, 1}};
-	unsigned int i, j;
+	int i, j;
 	unsigned int ind;
 	int sumHorizontal = 0;
 	int sumVertical = 0;
@@ -294,12 +294,9 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		}
 	}
 
-	component.x = (sumHorizontal/(4.0f*255))/sqrt(2.0);
-	component.y = (sumVertical/(4.0f*255))/sqrt(2.0);
+	component.x = sumHorizontal/(4.0f*255);
+	component.y = sumVertical/(4.0f*255);
 	component.z = 0.0f;
-
-	if(component.x != 0.0f || component.y != 0.0f || component.z != 0.0f)
-		cout << component << endl;
 
 	//Find normal rotation
 
