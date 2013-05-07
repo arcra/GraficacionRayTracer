@@ -19,7 +19,6 @@ namespace RayTracing
 
 			float radius;
 			Vector3D center;
-			Vector3D origin;
 
 			Sphere(float radius, Vector3D center);
 			Sphere(float radius, Vector3D center, Material m);
@@ -30,6 +29,9 @@ namespace RayTracing
 			virtual void getTextureCoords(Vector3D point, int& u, int& v);
 
 			virtual ~Sphere();
+
+		protected:
+			Vector3D origin;
 	};
 }
 #endif /* SPHERE_H_ */

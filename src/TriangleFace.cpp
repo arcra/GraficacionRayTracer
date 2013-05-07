@@ -35,7 +35,7 @@ TriangleFace::TriangleFace(Vertex v1, Vertex v2, Vertex v3, Material m) : v1(v1.
 
 bool TriangleFace::isSurfaceHit(ray r, float& t)
 {
-	if((r.s - r.e).dotProduct(this->computeNormal(Vector3D(0.0f, 0.0f, 0.0f))) >= 0.0)
+	if(round((r.s - r.e).dotProduct(this->computeNormal(Vector3D(0.0f, 0.0f, 0.0f))), 6) >= 0.0)
 		return false;
 	float a,b,c,d,e,f,g,h,i;
 
@@ -71,7 +71,7 @@ bool TriangleFace::isSurfaceHit(ray r, float& t)
 
 	t = (f*ak_minus_jb + e*jc_minus_al + d*bl_minus_kc)/-M;
 
-	if(t <= 0.0)
+	if(t <= 0.0f)
 		return false;
 
 	gamma = (i*ak_minus_jb + h*jc_minus_al + g*bl_minus_kc)/M;

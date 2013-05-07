@@ -91,7 +91,7 @@ void RayTracer::renderScence()
 			ws = camera->focalPoint;
 
 			currentRay.e = camera->position;
-			currentRay.s = Vector3D(us, vs, ws);
+			currentRay.s = us*camera->cameraU + vs*camera->cameraV + ws*camera->cameraW;
 			if(currentRay.e.x == currentRay.s.x && currentRay.e.y == currentRay.s.y && currentRay.e.z == currentRay.s.z)
 				continue;
 			currentRay.lifeSpan = 1.0;
@@ -108,10 +108,9 @@ void RayTracer::renderScence()
 			if(surfaces[surfaceIndex]->mat.textureMap || surfaces[surfaceIndex]->mat.bumpMap)
 				surfaces[surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
 
+			matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
 			if(surfaces[surfaceIndex]->mat.textureMap)
 				getTexturePixelToVector3D(u, v, matDiffuse, surfaces[surfaceIndex]->mat.textureMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
-			else
-				matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
 
 			surfNormal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
 			if(surfaces[surfaceIndex]->mat.bumpMap)
@@ -246,7 +245,6 @@ void RayTracer::renderScence()
 
 unsigned char* RayTracer::getImageBuffer()
 {
-
 	return this->rgbBuffer;
 }
 
@@ -278,19 +276,19 @@ void  RayTracer::loadIdentity()
 void RayTracer::rotate(float angle_x, float angle_y, float angle_z)
 {
 	float** rotationMatrix = getRotationMatrix(angle_x, angle_y, angle_z);
-	multMatrix4Matrix4(rotationMatrix, this->transformationMatrix, this->transformationMatrix);
+	multMatrix4Matrix4(this->transformationMatrix, rotationMatrix, this->transformationMatrix);
 }
 
 void RayTracer::scale(float sx, float sy, float sz)
 {
 	float** scalingMatrix = getScalingMatrix(sx, sy, sz);
-	multMatrix4Matrix4(scalingMatrix, this->transformationMatrix, this->transformationMatrix);
+	multMatrix4Matrix4(this->transformationMatrix, scalingMatrix, this->transformationMatrix);
 }
 
 void RayTracer::translate(float tx, float ty, float tz)
 {
 	float** translationMatrix = getTranslationMatrix(tx, ty, tz);
-	multMatrix4Matrix4(translationMatrix, this->transformationMatrix, this->transformationMatrix);
+	multMatrix4Matrix4(this->transformationMatrix, translationMatrix, this->transformationMatrix);
 }
 
 void RayTracer::pushMatrix()
@@ -323,7 +321,6 @@ void RayTracer::popMatrix()
 		free(temp[i]);
 	free(temp);
 }
-
 
 bool RayTracer::pathToLightIsClear(Vector3D point, Vector3D lightPosition)
 {

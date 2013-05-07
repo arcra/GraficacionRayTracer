@@ -23,7 +23,7 @@ namespace RayTracing
 
 		this->radius = radius;
 		this->center = center;
-		this->origin = Vector3D(0.0f, 1.0f, 0.0f);
+		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
 	Sphere::Sphere(float radius, Vector3D center, Material m)  : ISurface()
@@ -32,7 +32,7 @@ namespace RayTracing
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
-		this->origin = Vector3D(0.0f, 1.0f, 0.0f);
+		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
 	}
 
 
@@ -76,27 +76,55 @@ namespace RayTracing
 		float oppSideMag;
 		float adySideMag;
 
-		Vector3D surfNormal = (this->computeNormal(point) - this->origin).getNormal();
+		//FIND SPHERE ROTATION...
 
-		planeProjection = surfNormal;
+		planeProjection = origin;
 		planeProjection.y = 0.0f;
 
 		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = surfNormal.y;
+		adySideMag = origin.y;
 
 		float angleY = atan2(oppSideMag, adySideMag);
 
 
-		planeProjection = surfNormal;
+		planeProjection = origin;
 		planeProjection.x = 0.0f;
 
 		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = surfNormal.x;
+		adySideMag = origin.x;
 
 		float angleX = atan2(oppSideMag, adySideMag);
 
+		//ROTATE NORMAL IN INVERSE ORDER
+		float **rotation = getInverseRotationMatrix(-angleX, -angleY, 0.0f);
+		Vector3D textureNormal;
+		multMatrixVector3D(rotation, this->computeNormal(point), textureNormal);
+
+		for(int i = 0; i < 4; i++)
+			free(rotation[i]);
+
+		free(rotation);
+
+		//FIND ANGLES FROM "UNROTATED" NORMAL
+		planeProjection = textureNormal;
+		planeProjection.y = 0.0f;
+
+		oppSideMag = planeProjection.getMagnitude();
+		adySideMag = textureNormal.y;
+
+		angleY = atan2(oppSideMag, adySideMag);
+
+
+		planeProjection = textureNormal;
+		planeProjection.x = 0.0f;
+
+		oppSideMag = planeProjection.getMagnitude();
+		adySideMag = textureNormal.x;
+
+		angleX = atan2(oppSideMag, adySideMag);
+
 		u = (int)round(angleX*mat.sizeMapX/(2*PI), 0);
-		v = (int)round(angleY*mat.sizeMapY/PI, 0);
+		v = mat.sizeMapY -1 - (int)round(angleY*(mat.sizeMapY-1)/PI, 0);
 	}
 
 	Sphere::~Sphere()

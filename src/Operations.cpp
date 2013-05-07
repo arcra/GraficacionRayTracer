@@ -14,10 +14,10 @@ using namespace std;
 void multMatrixVector3D(float** m, const Vector3D a, Vector3D& r)
 {
   Vector3D temp = a;
-  r.x = m[0][0] * temp.x + m[0][1] * temp.y + m[0][2] * temp.z + m[0][3] * temp.w;
-  r.y = m[1][0] * temp.x + m[1][1] * temp.y + m[1][2] * temp.z + m[1][3] * temp.w;
-  r.z = m[2][0] * temp.x + m[2][1] * temp.y + m[2][2] * temp.z + m[2][3] * temp.w;
-  r.w = m[3][0] * temp.x + m[3][1] * temp.y + m[3][2] * temp.z + m[3][3] * temp.w;
+  r.x = round(m[0][0] * temp.x + m[0][1] * temp.y + m[0][2] * temp.z + m[0][3] * temp.w, 6);
+  r.y = round(m[1][0] * temp.x + m[1][1] * temp.y + m[1][2] * temp.z + m[1][3] * temp.w, 6);
+  r.z = round(m[2][0] * temp.x + m[2][1] * temp.y + m[2][2] * temp.z + m[2][3] * temp.w, 6);
+  r.w = round(m[3][0] * temp.x + m[3][1] * temp.y + m[3][2] * temp.z + m[3][3] * temp.w, 6);
 }
 
 void multMatrix4Matrix4(float** a, float** b, float** r)
@@ -113,6 +113,71 @@ float** getRotationMatrix(float angle_x, float angle_y, float angle_z){
 	  tempRot[1][1] = cos(angle);
 	  //printMatrix(rotacion,4);
 	  //return (float**)rotacion;
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		free(tempRot[i]);
+
+	free(tempRot);
+	return (float**)rotacion;
+}
+
+float** getInverseRotationMatrix(float angle_x, float angle_y, float angle_z){
+
+	float **rotacion, **tempRot;
+	float angle;
+	rotacion = (float**)malloc(sizeof(float*)*4);
+	for(int i = 0; i < 4; i++)
+		rotacion[i] = (float*)malloc(sizeof(float)*4);
+
+	tempRot = (float**)malloc(sizeof(float*)*4);
+	for(int i = 0; i < 4; i++)
+		tempRot[i] = (float*)malloc(sizeof(float)*4);
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+			rotacion[i][j] = tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_z != 0.0)
+	{
+	  angle = -PI*angle_z/180;
+	  tempRot[0][0] = cos(angle);
+	  tempRot[0][1] = -sin(angle);
+	  tempRot[1][0] = sin(angle);
+	  tempRot[1][1] = cos(angle);
+	  //printMatrix(rotacion,4);
+	  //return (float**)rotacion;
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+		  tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_y != 0.0)
+	{
+	  angle = -PI*angle_y/180;
+	  tempRot[0][0] = cos(angle);
+	  tempRot[0][2] = sin(angle);
+	  tempRot[2][0] = -sin(angle);
+	  tempRot[2][2] = cos(angle);
+	  //printMatrix(rotacion,4);
+	  //return (float**)rotacion;
+	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
+	}
+
+	for(int i = 0; i < 4; i++)
+		for(int j = 0; j < 4; j++)
+			tempRot[i][j] = static_cast<float>(i == j);
+
+	if(angle_x != 0.0)
+	{
+	  angle = -PI*angle_x/180;
+	  tempRot[1][1] = cos(angle);
+	  tempRot[1][2] = -sin(angle);
+	  tempRot[2][1] = sin(angle);
+	  tempRot[2][2] = cos(angle);
 	  multMatrix4Matrix4(tempRot, rotacion, rotacion);
 	}
 
@@ -294,35 +359,60 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		}
 	}
 
-	component.x = sumHorizontal/(4.0f*255);
-	component.y = sumVertical/(4.0f*255);
-	component.z = 0.0f;
+	component.x = sumHorizontal/255.0f;
+	component.y = 0.0f;
+	component.z = sumVertical/255.0f;
 
 	//Find normal rotation
 
-	Vector3D planeProjection;
+	Vector3D n = surfNormal;
+
 	float oppSideMag;
 	float adySideMag;
+	float angleY = 0.0f;
+	float angleX = 0.0f;
+	float **rotationMatrix;
 
-	planeProjection = surfNormal;
-	planeProjection.y = 0.0f;
+	if(round(n.x, 6) != 0.0f)
+	{
+		if(round(n.z, 6) != 0.0f)
+		{
+			oppSideMag = n.x;
+			adySideMag = n.z;
 
-	oppSideMag = planeProjection.getMagnitude();
-	adySideMag = surfNormal.y;
+			angleY = atan2(oppSideMag, adySideMag)*180/PI;
+		}
+		else
+		{
+			angleY = 90.0f;
+		}
 
-	float angleY = atan2(oppSideMag, adySideMag)*180/PI;
+		rotationMatrix = getInverseRotationMatrix(0.0f, angleY, 0.0f);
 
+		multMatrixVector3D(rotationMatrix, n, n);
 
-	planeProjection = surfNormal;
-	planeProjection.x = 0.0f;
+		for(int i = 0; i < 4; i++)
+			free(rotationMatrix[i]);
+		free(rotationMatrix);
+	}
 
-	oppSideMag = planeProjection.getMagnitude();
-	adySideMag = surfNormal.x;
+	if(round(n.z, 6) != 0.0f)
+	{
+		if(round(n.y, 6) != 0.0f)
+		{
+			oppSideMag = n.z;
+			adySideMag = n.y;
 
-	float angleX = atan2(oppSideMag, adySideMag)*180/PI;
+			angleX = atan2(oppSideMag, adySideMag)*180/PI;
+		}
+		else
+		{
+			angleX = 90.0f;
+		}
+	}
 
 	//rotate gradient vector
-	float **rotationMatrix = getRotationMatrix(angleX, angleY, 0.0f);
+	rotationMatrix = getRotationMatrix(angleX, angleY, 0.0f);
 
 	multMatrixVector3D(rotationMatrix, component, component);
 
@@ -332,7 +422,7 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 	free(rotationMatrix);
 	//Add both vectors and normalize
 
-	component = (component + surfNormal).getNormal();
+	component = (6*component + surfNormal).getNormal();
 }
 
 float round(float num, unsigned char decimals){

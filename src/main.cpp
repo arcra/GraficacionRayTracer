@@ -4,14 +4,16 @@
 #include <glib/gtypes.h>
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 #include "Structures.h"
 #include "Vector3D.h"
 #include "RayTracer.h"
 #include "Surfaces.h"
-//#include "puntos.h"
 
 #define IMAGE_WIDTH 700
 #define IMAGE_HEIGHT 700
+
+#define PI (3.141592653589793)
 
 using namespace std;
 using namespace RayTracing;
@@ -61,8 +63,9 @@ void initScene()
 {
 	rayTracer = new RayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-	Vector3D pos(0.0f, 40.0f, 190.0f);
+	Vector3D pos(190.0f, 40.0f, 0.0f);
 	Vector3D u(0.0f, 1.0f, 0.0f);
+	//Doesn't matter, since rays are defined by viewport position
 	Vector3D dir(0.0f, 40.0f, 0.0f);
 
 	rayTracer->camera = new Camera(pos,u,dir,true);
@@ -89,8 +92,8 @@ void initScene()
 	matTable.shininess = 1.0f;
 
 	Material matFloor;
-	matFloor.diffuse.x = 0.8f;
-	matFloor.diffuse.y = 0.8f;
+	matFloor.diffuse.x = 0.0f;
+	matFloor.diffuse.y = 0.0f;
 	matFloor.diffuse.z = 0.8f;
 	//matFloor.specular = Vector3D(1.0f,1.0f,1.0f);
 	matFloor.specular = nullVector3D;
@@ -106,6 +109,8 @@ void initScene()
 	matLeft.specular = nullVector3D;
 	matLeft.reflective = nullVector3D;
 	matLeft.shininess = 0.1f;
+	//matLeft.textureMap = readTextureFromBMP("resources/WorldMapReal_texture.bmp", matLeft.sizeMapX, matLeft.sizeMapY);
+	matLeft.bumpMap = readTextureFromBMP("resources/test.bmp", matLeft.sizeMapX, matLeft.sizeMapY);
 
 	Material matBack;
 	matBack.diffuse.x = 1.0f;
@@ -148,18 +153,18 @@ void initScene()
 	matSp1.shininess = 25.0f;
 
 	Material matSp2;
-//	matSp2.diffuse.x = 0.6f;
-//	matSp2.diffuse.y = 0.6f;
-//	matSp2.diffuse.z = 0.6f;
-	matSp2.diffuse.x = 1.0f;
-	matSp2.diffuse.y = 1.0f;
-	matSp2.diffuse.z = 1.0f;
+	matSp2.diffuse.x = 0.6f;
+	matSp2.diffuse.y = 0.6f;
+	matSp2.diffuse.z = 0.6f;
+//	matSp2.diffuse.x = 1.0f;
+//	matSp2.diffuse.y = 1.0f;
+//	matSp2.diffuse.z = 1.0f;
 	matSp2.specular = medVector3D;
-//	matSp2.reflective = fullVector3D;
-	matSp2.reflective = nullVector3D;
+	matSp2.reflective = fullVector3D;
+//	matSp2.reflective = nullVector3D;
 	matSp2.shininess = 25.0f;
-	matSp2.textureMap = readTextureFromBMP("resources/worldMap_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
-	matSp2.bumpMap = readBumpMapFromBMP("resources/worldMap_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+//	matSp2.textureMap = readTextureFromBMP("resources/WorldMapReal_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+//	matSp2.bumpMap = readBumpMapFromBMP("resources/WorldMapReal_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 
 	Material matSp3;
 	matSp3.diffuse.x = 1.0f;
@@ -198,11 +203,11 @@ void initScene()
 	Vector3D v7( 40.0f, 80.0f,-40.0f);
 	Vector3D v8(-40.0f, 80.0f,-40.0f);
 
-	TriangleFace *plane1 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v3, 0.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), matFloor);
-	TriangleFace *plane2 = new TriangleFace(Vertex(v2, 1.0f, 0.0f), Vertex(v4, 0.0f, 1.0f), Vertex(v1, 1.0f, 1.0f), matFloor);
+	TriangleFace *plane1 = new TriangleFace(Vertex(v2, 1.0f, 1.0f), Vertex(v3, 0.0f, 1.0f), Vertex(v4, 0.0f, 0.0f), matFloor);
+	TriangleFace *plane2 = new TriangleFace(Vertex(v2, 1.0f, 1.0f), Vertex(v4, 0.0f, 0.0f), Vertex(v1, 1.0f, 0.0f), matFloor);
 
-	TriangleFace *plane3 = new TriangleFace(Vertex(v4), Vertex(v3), Vertex(v8), matLeft);
-	TriangleFace *plane4 = new TriangleFace(Vertex(v5), Vertex(v4), Vertex(v8), matLeft);
+	TriangleFace *plane3 = new TriangleFace(Vertex(v4, 0.0f, 0.0f), Vertex(v3, 1.0f, 0.0f), Vertex(v8, 1.0f, 1.0f), matLeft);
+	TriangleFace *plane4 = new TriangleFace(Vertex(v5, 0.0f, 1.0f), Vertex(v4, 0.0f, 0.0f), Vertex(v8, 1.0f, 1.0f), matLeft);
 
 	TriangleFace *plane5 = new TriangleFace(Vertex(v3), Vertex(v7), Vertex(v8), matBack);
 	TriangleFace *plane6 = new TriangleFace(Vertex(v2), Vertex(v7), Vertex(v3), matBack);
@@ -244,9 +249,9 @@ void initScene()
 
 	rayTracer->pushMatrix();
 
-		rayTracer->scale(15.0, 2.0, 25.0);
-		rayTracer->rotate(0.0f, 40.0f, 0.0f);
 		rayTracer->translate(-10.0, 15.0, 5.0);
+		rayTracer->rotate(0.0f, 40.0f, 0.0f);
+		rayTracer->scale(15.0, 2.0, 25.0);
 
 		addCube(1.0f, matTable);
 
@@ -265,7 +270,12 @@ void initScene()
 	rayTracer->addSurface(plane11);
 	rayTracer->addSurface(plane12);
 	rayTracer->addSurface(sphere1);
-	rayTracer->addSurface(sphere2);
+
+	rayTracer->pushMatrix();
+		//rayTracer->rotate(0.0f, 0.0f, 0.0f);
+		rayTracer->addSurface(sphere2);
+	rayTracer->popMatrix();
+
 	rayTracer->addSurface(sphere3);
 
 
