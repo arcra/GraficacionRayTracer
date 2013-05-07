@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define IMAGE_WIDTH 800
-#define IMAGE_HEIGHT 800
+#define IMAGE_WIDTH 600
+#define IMAGE_HEIGHT 600
 
 #define PI (3.141592653589793)
 
@@ -108,7 +108,7 @@ void initScene()
 	matFloor.reflective = nullVector3D;
 	matFloor.shininess = 0.3f;
 	matFloor.textureMap = readTextureFromBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
-	matFloor.bumpMap = readBumpMapFromBMP("resources/floot_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+	matFloor.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 
 	Material matTableBump;
 	matTableBump.diffuse.x = 0.63f;
@@ -173,10 +173,11 @@ void initScene()
 	matSp2.diffuse.y = 0.6f;
 	matSp2.diffuse.z = 0.6f;
 	matSp2.specular = medVector3D;
-	matSp2.reflective = fullVector3D;
-//	matSp2.reflective = nullVector3D;
+//	matSp2.reflective = fullVector3D;
+//	matSp2.reflective = lowVector3D;
+	matSp2.reflective = nullVector3D;
 	matSp2.shininess = 25.0f;
-//	matSp2.textureMap = readTextureFromBMP("resources/WorldMapReal_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+	matSp2.textureMap = readTextureFromBMP("resources/WorldMapReal_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 //	matSp2.bumpMap = readBumpMapFromBMP("resources/WorldMapReal_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 
 	Material matSp3;

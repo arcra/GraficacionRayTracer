@@ -23,7 +23,8 @@ namespace RayTracing
 
 		this->radius = radius;
 		this->center = center;
-		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
+		this->originX = Vector3D(0.0f, 0.0f, 1.0f);
+		this->originY = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
 	Sphere::Sphere(float radius, Vector3D center, Material m)  : ISurface()
@@ -32,7 +33,8 @@ namespace RayTracing
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
-		this->origin = Vector3D(1.0f, 0.0f, 0.0f);
+		this->originX = Vector3D(0.0f, 0.0f, 1.0f);
+		this->originY = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
 
@@ -67,64 +69,126 @@ namespace RayTracing
 
 	void Sphere::applyTransformation(float** m)
 	{
-		multMatrixVector3D(m, this->origin, this->origin);
+		multMatrixVector3D(m, this->originX, this->originX);
+		multMatrixVector3D(m, this->originY, this->originY);
 	}
 
 	void Sphere::getTextureCoords(Vector3D point, int& u, int& v)
 	{
-		Vector3D planeProjection;
-		float oppSideMag;
-		float adySideMag;
-
 		//FIND SPHERE ROTATION...
 
-		planeProjection = origin;
-		planeProjection.y = 0.0f;
+		float oppSideMag;
+		float adySideMag;
+		float angleY = 0.0f;
+		float angleX = 0.0f;
+		float **rotationMatrix;
 
-		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = origin.y;
+		int i;
 
-		float angleY = atan2(oppSideMag, adySideMag);
+		Vector3D n = originX;
 
+		oppSideMag = round(n.x, 6);
+		adySideMag = round(n.z, 6);
 
-		planeProjection = origin;
-		planeProjection.x = 0.0f;
+		if(oppSideMag != 0.0f)
+		{
+			if(adySideMag != 0.0f)
+			{
+				angleY = atan2(oppSideMag, adySideMag)*180/PI;
+			}
+			else
+			{
+				if(oppSideMag > 0.0f)
+					angleY = 90.0f;
+				else
+					angleY = -90.0f;
+			}
 
-		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = origin.x;
+			rotationMatrix = getInverseRotationMatrix(0.0f, angleY, 0.0f);
 
-		float angleX = atan2(oppSideMag, adySideMag);
+			multMatrixVector3D(rotationMatrix, originY, n);
 
-		//ROTATE NORMAL IN INVERSE ORDER
-		float **rotation = getInverseRotationMatrix(-angleX, -angleY, 0.0f);
-		Vector3D textureNormal;
-		multMatrixVector3D(rotation, this->computeNormal(point), textureNormal);
+			for(i = 0; i < 4; i++)
+				free(rotationMatrix[i]);
+			free(rotationMatrix);
+		}
 
-		for(int i = 0; i < 4; i++)
-			free(rotation[i]);
+		oppSideMag = round(n.z, 6);
+		adySideMag = round(n.y, 6);
 
-		free(rotation);
+		if(oppSideMag != 0.0f)
+		{
+			if(adySideMag != 0.0f)
+			{
+				angleX = atan2(oppSideMag, adySideMag)*180/PI;
+			}
+			else
+			{
+				if(oppSideMag > 0.0f)
+					angleX = 90.0f;
+				else
+					angleX = -90.0f;
+			}
+		}
+
+		n = computeNormal(point);
+
+		rotationMatrix = getInverseRotationMatrix(angleX, angleY, 0.0f);
+
+		multMatrixVector3D(rotationMatrix, n, n);
+
+		for(i = 0; i < 4; i++)
+			free(rotationMatrix[i]);
+		free(rotationMatrix);
 
 		//FIND ANGLES FROM "UNROTATED" NORMAL
-		planeProjection = textureNormal;
-		planeProjection.y = 0.0f;
 
-		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = textureNormal.y;
+		oppSideMag = round(n.x, 6);
+		adySideMag = round(n.z, 6);
 
-		angleY = atan2(oppSideMag, adySideMag);
+		if(oppSideMag != 0.0f)
+		{
+			if(adySideMag != 0.0f)
+			{
+				angleY = atan2(oppSideMag, adySideMag);
+			}
+			else
+			{
+				if(oppSideMag > 0.0f)
+					angleY = PI/2.0f;
+				else
+					angleY = -PI/2.0f;
+			}
 
+			rotationMatrix = getInverseRotationMatrix(0.0f, angleY, 0.0f);
 
-		planeProjection = textureNormal;
-		planeProjection.x = 0.0f;
+			multMatrixVector3D(rotationMatrix, n, n);
 
-		oppSideMag = planeProjection.getMagnitude();
-		adySideMag = textureNormal.x;
+			for(i = 0; i < 4; i++)
+				free(rotationMatrix[i]);
+			free(rotationMatrix);
+		}
 
-		angleX = atan2(oppSideMag, adySideMag);
+		oppSideMag = round(n.z, 6);
+		adySideMag = round(n.y, 6);
+
+		if(oppSideMag != 0.0f)
+		{
+			if(adySideMag != 0.0f)
+			{
+				angleX = atan2(oppSideMag, adySideMag);
+			}
+			else
+			{
+				if(oppSideMag > 0.0f)
+					angleX = PI/2.0f;
+				else
+					angleX = -PI/2.0f;
+			}
+		}
 
 		u = (int)round(angleX*mat.sizeMapX/(2*PI), 0);
-		v = mat.sizeMapY -1 - (int)round(angleY*(mat.sizeMapY-1)/PI, 0);
+		v = mat.sizeMapY -1 - (int)round((angleY-PI/2.0f)*(mat.sizeMapY-1)/PI, 0);
 	}
 
 	Sphere::~Sphere()

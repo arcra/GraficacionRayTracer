@@ -108,9 +108,10 @@ void RayTracer::renderScence()
 			if(surfaces[surfaceIndex]->mat.textureMap || surfaces[surfaceIndex]->mat.bumpMap)
 				surfaces[surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
 
-			matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
 			if(surfaces[surfaceIndex]->mat.textureMap)
 				getTexturePixelToVector3D(u, v, matDiffuse, surfaces[surfaceIndex]->mat.textureMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);
+			else
+				matDiffuse = surfaces[surfaceIndex]->mat.diffuse;
 
 			surfNormal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
 			if(surfaces[surfaceIndex]->mat.bumpMap)

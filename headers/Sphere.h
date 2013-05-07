@@ -31,7 +31,8 @@ namespace RayTracing
 			virtual ~Sphere();
 
 		protected:
-			Vector3D origin;
+			Vector3D originX;
+			Vector3D originY;
 	};
 }
 #endif /* SPHERE_H_ */
