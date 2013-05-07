@@ -8,10 +8,12 @@
 #include "Vector3D.h"
 #include "RayTracer.h"
 #include "Surfaces.h"
+#include <stdio.h>
+#include <stdlib.h>
 //#include "puntos.h"
 
-#define IMAGE_WIDTH 700
-#define IMAGE_HEIGHT 700
+#define IMAGE_WIDTH 500
+#define IMAGE_HEIGHT 500
 
 using namespace std;
 using namespace RayTracing;
@@ -26,7 +28,8 @@ gboolean on_darea_expose (GtkWidget *widget,GdkEventExpose *event,gpointer user_
 void initWindow(int argc, char *argv[]);
 
 void addCube(float size, Material mat);
-
+void addTable(float x, float y , float z, Material matTable);
+void addMirror(Material mat);
 
 int main(int argc, char* argv[])
 {
@@ -36,14 +39,19 @@ int main(int argc, char* argv[])
   rayTracer->renderScence();
 
   gtk_main();
+  
+  FILE *out;
+  out = fopen("./imagenes/test1.ppm","wb");
+  fprintf(out,"P6\n%d %d\n255\n",IMAGE_WIDTH,IMAGE_HEIGHT);
+  fwrite(rayTracer->getImageBuffer(),1,IMAGE_WIDTH*IMAGE_HEIGHT*3,out);
+  fclose(out);
+
 
   delete rayTracer;
 //  free(window);
 //  free(drawingArea);
   return 0;
 }
-
-
 
 gboolean on_darea_expose (GtkWidget *widget,
 		 GdkEventExpose *event,
@@ -61,6 +69,7 @@ void initScene()
 {
 	rayTracer = new RayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
+	//Vector3D pos(95.0f, 40.0f, 95.0f);
 	Vector3D pos(0.0f, 40.0f, 190.0f);
 	Vector3D u(0.0f, 1.0f, 0.0f);
 	Vector3D dir(0.0f, 40.0f, 0.0f);
@@ -98,6 +107,16 @@ void initScene()
 	matFloor.shininess = 0.3f;
 	matFloor.textureMap = readTextureFromBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 	matFloor.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+
+	Material matTableBump;
+	matTableBump.diffuse.x = 0.63f;
+	matTableBump.diffuse.y = 0.32f;
+	matTableBump.diffuse.z = 0.18f;
+	matTableBump.specular = lowVector3D;
+	matTableBump.reflective = nullVector3D;
+	matTableBump.shininess = 1.0f;
+	matTableBump.textureMap = readTextureFromBMP("resources/wood.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
+	//matTableBump.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
 
 	Material matLeft;
 	matLeft.diffuse.x = 0.0f;
@@ -152,14 +171,14 @@ void initScene()
 //	matSp2.diffuse.y = 0.6f;
 //	matSp2.diffuse.z = 0.6f;
 	matSp2.diffuse.x = 1.0f;
-	matSp2.diffuse.y = 1.0f;
+	matSp2.diffuse.y = 0.0f;
 	matSp2.diffuse.z = 1.0f;
 	matSp2.specular = medVector3D;
 //	matSp2.reflective = fullVector3D;
 	matSp2.reflective = nullVector3D;
 	matSp2.shininess = 25.0f;
-	matSp2.textureMap = readTextureFromBMP("resources/worldMap_texture.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
-	matSp2.bumpMap = readBumpMapFromBMP("resources/worldMap_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+	matSp2.textureMap = readTextureFromBMP("resources/earth2.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
+	matSp2.bumpMap = readBumpMapFromBMP("resources/earth_bump.bmp", matSp2.sizeMapX, matSp2.sizeMapY);
 
 	Material matSp3;
 	matSp3.diffuse.x = 1.0f;
@@ -168,6 +187,14 @@ void initScene()
 	matSp3.specular = nullVector3D;
 	matSp3.reflective = nullVector3D;
 	matSp3.shininess = 1.0f;
+
+	Material matMirror;
+	matMirror.diffuse.x = 0.9f;
+	matMirror.diffuse.y = 0.9f;
+	matMirror.diffuse.z = 1.0f;
+	matMirror.specular = hiVector3D;
+	matMirror.reflective = fullVector3D;
+	matMirror.shininess = 25.0f;
 
 
 	Vector3D v1bis( 80.0f, 0.0f, 80.0f);
@@ -178,7 +205,7 @@ void initScene()
 
 	/*
 	     8------------7
-		/|           /|
+	    /|           /|
 	   / |          / |
 	  5------------6  |
 	  |  3---------|--2
@@ -217,8 +244,8 @@ void initScene()
 	TriangleFace *plane12 = new TriangleFace(Vertex(v5), Vertex(v1), Vertex(v4), matFront);
 
 	float offsetX1,offsetX2,
-	    offsetY1,offsetY2,
-	    offsetZ1,offsetZ2,radio;
+	  offsetY1,offsetY2,
+	  offsetZ1,offsetZ2,radio;
 
 	radio = 8.0f;
 
@@ -242,15 +269,23 @@ void initScene()
 	Sphere *sphere2 = new Sphere(radio,sphpos2+offsetM2+centroMesa2,matSp2);
 	Sphere *sphere3 = new Sphere(0.5f,sphpos3,matSp3);
 
+	addTable(-20,0,-10,matTableBump);
+	addTable(20,0,25,matTableBump);
+	
 	rayTracer->pushMatrix();
-
-		rayTracer->scale(15.0, 2.0, 25.0);
-		rayTracer->rotate(0.0f, 40.0f, 0.0f);
-		rayTracer->translate(-10.0, 15.0, 5.0);
-
-		addCube(1.0f, matTable);
-
+	rayTracer->translate(1.0,40.0,-39.7);
+	rayTracer->scale(60.0,30.0,1.0);
+	addMirror(matMirror);
 	rayTracer->popMatrix();
+		
+	rayTracer->pushMatrix();
+	rayTracer->translate(1.0,40.0,-39.9);
+	rayTracer->scale(63.0,33.0,1.0);
+	addMirror(matTable);
+	rayTracer->popMatrix();
+	
+	
+
 
 	rayTracer->addSurface(plane1);
 	rayTracer->addSurface(plane2);
@@ -274,16 +309,6 @@ void initScene()
 void addCube(float size, Material mat)
 {
 	float halfSize = size/2.0f;
-	/*
-		 8------------7
-		/|           /|
-	   / |          / |
-	  5------------6  |
-	  |  3---------|--2
-	  | /          | /
-	  |/           |/
-	  4----------- 1
-	*/
 
 	Vector3D v1( halfSize, -halfSize, halfSize);
 	Vector3D v2( halfSize, -halfSize,-halfSize);
@@ -295,24 +320,102 @@ void addCube(float size, Material mat)
 	Vector3D v7( halfSize, halfSize,-halfSize);
 	Vector3D v8(-halfSize, halfSize,-halfSize);
 
-	rayTracer->addSurface(new TriangleFace(v1,v3,v2,mat));
-	rayTracer->addSurface(new TriangleFace(v1,v4,v3,mat));
+	/*	 8------------7
+		/|           /|
+	   / |          / |
+	  5------------6  |
+	  |  3---------|--2
+	  | /          | /
+	  |/           |/
+	  4----------- 1 */
+	
+	rayTracer->addSurface(new TriangleFace(Vertex(v1,1.0f,1.0f),Vertex(v3,0.0f,0.0f),Vertex(v2,1.0f,0.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v1,1.0f,1.0f),Vertex(v4,0.0f,0.0f),Vertex(v3,0.0f,0.0f),mat));
 
-	rayTracer->addSurface(new TriangleFace(v5,v3,v4,mat));
-	rayTracer->addSurface(new TriangleFace(v8,v3,v5,mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v5,1.0f,1.0f),Vertex(v3,0.0f,0.0f),Vertex(v4,1.0f,0.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v8,0.0f,1.0f),Vertex(v3,0.0f,0.0f),Vertex(v5,1.0f,1.0f),mat));
 
-	rayTracer->addSurface(new TriangleFace(v8,v2,v3,mat));
-	rayTracer->addSurface(new TriangleFace(v8,v7,v2,mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v8,1.0f,1.0f),Vertex(v2,0.0f,0.0f),Vertex(v3,1.0f,0.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v8,1.0f,1.0f),Vertex(v7,0.0f,1.0f),Vertex(v2,0.0f,0.0f),mat));
 
-	rayTracer->addSurface(new TriangleFace(v6,v1,v7,mat));
-	rayTracer->addSurface(new TriangleFace(v7,v1,v2,mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v6,0.0f,1.0f),Vertex(v1,0.0f,0.0f),Vertex(v7,1.0f,1.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v7,1.0f,1.0f),Vertex(v1,0.0f,0.0f),Vertex(v2,1.0f,0.0f),mat));
 
-	rayTracer->addSurface(new TriangleFace(v5,v7,v8,mat));
-	rayTracer->addSurface(new TriangleFace(v5,v6,v7,mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v5,0.0f,0.0f),Vertex(v7,1.0f,1.0f),Vertex(v8,0.0f,1.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v5,0.0f,0.0f),Vertex(v6,1.0f,0.0f),Vertex(v7,1.0f,1.0f),mat));
 
+	rayTracer->addSurface(new TriangleFace(Vertex(v6,1.0f,1.0f),Vertex(v5,0.0f,1.0f),Vertex(v4,0.0f,0.0f),mat));
+	rayTracer->addSurface(new TriangleFace(Vertex(v1,1.0f,0.0f),Vertex(v6,1.0f,1.0f),Vertex(v4,0.0f,0.0f),mat));
+}
+
+
+void addTable(float x, float y , float z, Material matTable)
+{
+
+	rayTracer->pushMatrix();
+	rayTracer->translate(x,y,z);
+
+	 rayTracer->pushMatrix();
+	 rayTracer->translate(0.0, 15.0, 0.0);
+	 //rayTracer->rotate(0.0f, 40.0f, 0.0f);
+	 rayTracer->scale(15.0, 2.0, 25.0);
+	 addCube(1.0f, matTable);	 
+	 rayTracer->popMatrix();
+	 
+	 
+	
+	 rayTracer->pushMatrix();
+	 rayTracer->translate(6.5, 7.0, 11.5);
+	 //rayTracer->rotate(0.0f, 40.0f, 0.0f);
+	 rayTracer->scale(2.0,14.0,2.0);
+	 addCube(1.0f, matTable);
+	 
+	 rayTracer->popMatrix();
+	 
+	 rayTracer->pushMatrix();
+	 rayTracer->translate(-6.5, 7.0, 11.5);
+	 //rayTracer->rotate(0.0f, 40.0f, 0.0f);
+	 rayTracer->scale(2.0,14.0,2.0);
+	 addCube(1.0f, matTable);	 
+	 rayTracer->popMatrix();
+	 
+	 rayTracer->pushMatrix();
+	 rayTracer->translate(-6.5, 7.0, -11.5);
+	 //rayTracer->rotate(0.0f, 40.0f, 0.0f);
+	 rayTracer->scale(2.0,14.0,2.0);
+	 addCube(1.0f, matTable);
+	 rayTracer->popMatrix();
+	 
+	 rayTracer->pushMatrix();
+	 rayTracer->translate(6.5, 7.0, -11.5);	 
+	 //rayTracer->rotate(0.0f, 40.0f, 0.0f);
+	 rayTracer->scale(2.0,14.0,2.0);
+	 addCube(1.0f, matTable);
+	 rayTracer->popMatrix();
+
+
+	rayTracer->popMatrix();
+}
+
+void addMirror(Material mat)
+{
+	float halfSize = 1.0/2.0f;
+	
+	Vector3D v1( halfSize, -halfSize, halfSize);
+	Vector3D v2( halfSize, -halfSize,-halfSize);
+	Vector3D v3(-halfSize, -halfSize,-halfSize);
+	Vector3D v4(-halfSize, -halfSize, halfSize);
+
+	Vector3D v5(-halfSize, halfSize, halfSize);
+	Vector3D v6( halfSize, halfSize, halfSize);
+	Vector3D v7( halfSize, halfSize,-halfSize);
+	Vector3D v8(-halfSize, halfSize,-halfSize);
+	
 	rayTracer->addSurface(new TriangleFace(v6,v5,v4,mat));
 	rayTracer->addSurface(new TriangleFace(v1,v6,v4,mat));
+	
 }
+
 
 void initWindow(int argc, char *argv[]){
 
