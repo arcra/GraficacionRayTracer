@@ -295,7 +295,7 @@ unsigned char* readBumpMapFromBMP(char* filename, int &sizeX, int &sizeY)
 	unsigned char *oneChannelData = new unsigned char[size];
 
 	for(i = 0; i < size; i++)
-		oneChannelData[i] = data[3*i+1];
+		oneChannelData[i] = data[3*i];
 
 	delete data;
 	return oneChannelData;
@@ -384,7 +384,10 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		}
 		else
 		{
-			angleY = 90.0f;
+			if(n.x > 0.0f)
+				angleY = 90.0f;
+			else
+				angleY = -90.0f;
 		}
 
 		rotationMatrix = getInverseRotationMatrix(0.0f, angleY, 0.0f);
@@ -407,7 +410,10 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		}
 		else
 		{
-			angleX = 90.0f;
+			if(n.z > 0.0f)
+				angleX = 90.0f;
+			else
+				angleX = -90.0f;
 		}
 	}
 
@@ -420,6 +426,7 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		free(rotationMatrix[i]);
 
 	free(rotationMatrix);
+
 	//Add both vectors and normalize
 
 	component = (6*component + surfNormal).getNormal();

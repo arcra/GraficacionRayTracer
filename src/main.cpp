@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define IMAGE_WIDTH 500
-#define IMAGE_HEIGHT 500
+#define IMAGE_WIDTH 800
+#define IMAGE_HEIGHT 800
 
 #define PI (3.141592653589793)
 
@@ -71,7 +71,7 @@ void initScene()
 {
 	rayTracer = new RayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-	Vector3D pos(0.0f, 40.0f, 190.0f);
+	Vector3D pos(190.0f, 40.0f, 0.0f);
 	Vector3D u(0.0f, 1.0f, 0.0f);
 	//Doesn't matter, since rays are defined by viewport position
 	Vector3D dir(0.0f, 40.0f, 0.0f);
@@ -108,7 +108,7 @@ void initScene()
 	matFloor.reflective = nullVector3D;
 	matFloor.shininess = 0.3f;
 	matFloor.textureMap = readTextureFromBMP("resources/floor_texture.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
-	matFloor.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
+	matFloor.bumpMap = readBumpMapFromBMP("resources/floot_bump.bmp", matFloor.sizeMapX, matFloor.sizeMapY);
 
 	Material matTableBump;
 	matTableBump.diffuse.x = 0.63f;
@@ -117,8 +117,8 @@ void initScene()
 	matTableBump.specular = lowVector3D;
 	matTableBump.reflective = nullVector3D;
 	matTableBump.shininess = 1.0f;
-	matTableBump.textureMap = readTextureFromBMP("resources/wood.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
-	//matTableBump.bumpMap = readBumpMapFromBMP("resources/floor_bump.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
+	matTableBump.textureMap = readTextureFromBMP("resources/wood_texture.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
+	matTableBump.bumpMap = readBumpMapFromBMP("resources/wood_bump.bmp", matTableBump.sizeMapX, matTableBump.sizeMapY);
 
 	Material matLeft;
 	matLeft.diffuse.x = 0.0f;
@@ -127,8 +127,6 @@ void initScene()
 	matLeft.specular = nullVector3D;
 	matLeft.reflective = nullVector3D;
 	matLeft.shininess = 0.1f;
-	//matLeft.textureMap = readTextureFromBMP("resources/WorldMapReal_texture.bmp", matLeft.sizeMapX, matLeft.sizeMapY);
-	matLeft.bumpMap = readTextureFromBMP("resources/test.bmp", matLeft.sizeMapX, matLeft.sizeMapY);
 
 	Material matBack;
 	matBack.diffuse.x = 1.0f;
@@ -238,11 +236,11 @@ void initScene()
 	TriangleFace *plane7 = new TriangleFace(Vertex(v7), Vertex(v2), Vertex(v6), matRight);
 	TriangleFace *plane8 = new TriangleFace(Vertex(v6), Vertex(v2), Vertex(v1), matRight);
 
-	TriangleFace *plane9 = new TriangleFace(Vertex(v8), Vertex(v7), Vertex(v6), matTop);
-	TriangleFace *plane10 = new TriangleFace(Vertex(v8), Vertex(v6), Vertex(v5), matTop);
+	TriangleFace *plane9 = new TriangleFace(Vertex(v8, 0.0f, 0.0f), Vertex(v7, 1.0f, 0.0f), Vertex(v6, 1.0f, 1.0f), matTop);
+	TriangleFace *plane10 = new TriangleFace(Vertex(v8, 0.0f, 0.0f), Vertex(v6, 1.0f, 1.0f), Vertex(v5, 0.0f, 1.0f), matTop);
 
-	TriangleFace *plane11 = new TriangleFace(Vertex(v5), Vertex(v6), Vertex(v1), matFront);
-	TriangleFace *plane12 = new TriangleFace(Vertex(v5), Vertex(v1), Vertex(v4), matFront);
+	TriangleFace *plane11 = new TriangleFace(Vertex(v5, 1.0f, 1.0f), Vertex(v6, 0.0f, 1.0f), Vertex(v1, 0.0f, 0.0f), matFront);
+	TriangleFace *plane12 = new TriangleFace(Vertex(v5, 1.0f, 1.0f), Vertex(v1, 0.0f, 0.0f), Vertex(v4, 1.0f, 0.0f), matFront);
 
 	float offsetX1,offsetX2,
 	  offsetY1,offsetY2,
