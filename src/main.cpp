@@ -15,6 +15,7 @@
 //#include <stringstream>
 #include <sstream>
 
+
 #define IMAGE_WIDTH 700
 #define IMAGE_HEIGHT 700
 
@@ -92,6 +93,7 @@ gboolean on_darea_expose (GtkWidget *widget,
 
 void initScene(float pf)
 {
+
   rayTracer = new RayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
   /*Vector3D pos(0.0f, 40.0f, 190.0f);
@@ -343,9 +345,6 @@ void initScene(float pf)
   rayTracer->scale(63.0,33.0,1.0);
   addMirror(matTable);
   rayTracer->popMatrix();
-	
-	
-
 
   rayTracer->addSurface(plane1);
   rayTracer->addSurface(plane2);
@@ -417,46 +416,44 @@ void addCube(float size, Material mat)
 void addTable(float x, float y , float z, Material matTable)
 {
 
-  rayTracer->pushMatrix();
-  rayTracer->translate(x,y,z);
+	rayTracer->pushMatrix();
+		rayTracer->translate(x,y,z);
 
-  rayTracer->pushMatrix();
-  rayTracer->translate(0.0, 15.0, 0.0);
-  //rayTracer->rotate(0.0f, 40.0f, 0.0f);
-  rayTracer->scale(15.0, 2.0, 25.0);
-  addCube(1.0f, matTable);	 
-  rayTracer->popMatrix();
+		rayTracer->pushMatrix();
+			rayTracer->translate(0.0, 15.0, 0.0);
+			//rayTracer->rotate(0.0f, 40.0f, 0.0f);
+			rayTracer->scale(15.0, 2.0, 25.0);
+			addCube(1.0f, matTable);
+		rayTracer->popMatrix();
+
 	 
+		rayTracer->pushMatrix();
+			rayTracer->translate(6.5, 7.0, 11.5);
+			//rayTracer->rotate(0.0f, 40.0f, 0.0f);
+			rayTracer->scale(2.0,14.0,2.0);
+			addCube(1.0f, matTable);
+		rayTracer->popMatrix();
 	 
-	
-  rayTracer->pushMatrix();
-  rayTracer->translate(6.5, 7.0, 11.5);
-  //rayTracer->rotate(0.0f, 40.0f, 0.0f);
-  rayTracer->scale(2.0,14.0,2.0);
-  addCube(1.0f, matTable);
+		rayTracer->pushMatrix();
+			rayTracer->translate(-6.5, 7.0, 11.5);
+			//rayTracer->rotate(0.0f, 40.0f, 0.0f);
+			rayTracer->scale(2.0,14.0,2.0);
+			addCube(1.0f, matTable);
+		rayTracer->popMatrix();
 	 
-  rayTracer->popMatrix();
+		rayTracer->pushMatrix();
+			rayTracer->translate(-6.5, 7.0, -11.5);
+			//rayTracer->rotate(0.0f, 40.0f, 0.0f);
+			rayTracer->scale(2.0,14.0,2.0);
+			addCube(1.0f, matTable);
+		rayTracer->popMatrix();
 	 
-  rayTracer->pushMatrix();
-  rayTracer->translate(-6.5, 7.0, 11.5);
-  //rayTracer->rotate(0.0f, 40.0f, 0.0f);
-  rayTracer->scale(2.0,14.0,2.0);
-  addCube(1.0f, matTable);	 
-  rayTracer->popMatrix();
-	 
-  rayTracer->pushMatrix();
-  rayTracer->translate(-6.5, 7.0, -11.5);
-  //rayTracer->rotate(0.0f, 40.0f, 0.0f);
-  rayTracer->scale(2.0,14.0,2.0);
-  addCube(1.0f, matTable);
-  rayTracer->popMatrix();
-	 
-  rayTracer->pushMatrix();
-  rayTracer->translate(6.5, 7.0, -11.5);	 
-  //rayTracer->rotate(0.0f, 40.0f, 0.0f);
-  rayTracer->scale(2.0,14.0,2.0);
-  addCube(1.0f, matTable);
-  rayTracer->popMatrix();
+		rayTracer->pushMatrix();
+			rayTracer->translate(6.5, 7.0, -11.5);
+			//rayTracer->rotate(0.0f, 40.0f, 0.0f);
+			rayTracer->scale(2.0,14.0,2.0);
+			addCube(1.0f, matTable);
+		rayTracer->popMatrix();
 
 
   rayTracer->popMatrix();
