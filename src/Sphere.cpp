@@ -23,7 +23,7 @@ namespace RayTracing
 
 		this->radius = radius;
 		this->center = center;
-		this->originX = Vector3D(0.0f, 0.0f, 1.0f);
+		this->originX = Vector3D(1.0f, 0.0f, 0.0f);
 		this->originY = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
@@ -33,7 +33,7 @@ namespace RayTracing
 		this->radius = radius;
 		this->center = center;
 		this->mat = m;
-		this->originX = Vector3D(0.0f, 0.0f, 1.0f);
+		this->originX = Vector3D(1.0f, 0.0f, 0.0f);
 		this->originY = Vector3D(0.0f, 1.0f, 0.0f);
 	}
 
@@ -87,8 +87,8 @@ namespace RayTracing
 
 		Vector3D n = originX;
 
-		oppSideMag = round(n.x, 6);
-		adySideMag = round(n.z, 6);
+		oppSideMag = round(-n.z, 6);
+		adySideMag = round(n.x, 6);
 
 		if(oppSideMag != 0.0f)
 		{
@@ -143,8 +143,8 @@ namespace RayTracing
 
 		//FIND ANGLES FROM "UNROTATED" NORMAL
 
-		oppSideMag = round(n.x, 6);
-		adySideMag = round(n.z, 6);
+		oppSideMag = round(-n.z, 6);
+		adySideMag = round(n.x, 6);
 
 		if(oppSideMag != 0.0f)
 		{

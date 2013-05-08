@@ -380,18 +380,18 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 	float angleX = 0.0f;
 	float **rotationMatrix;
 
-	if(round(n.x, 6) != 0.0f)
-	{
-		if(round(n.z, 6) != 0.0f)
-		{
-			oppSideMag = n.x;
-			adySideMag = n.z;
+	oppSideMag = round(-n.z, 6);
+	adySideMag = round(n.x, 6);
 
+	if(oppSideMag != 0.0f)
+	{
+		if(adySideMag != 0.0f)
+		{
 			angleY = atan2(oppSideMag, adySideMag)*180/PI;
 		}
 		else
 		{
-			if(n.x > 0.0f)
+			if(oppSideMag > 0.0f)
 				angleY = 90.0f;
 			else
 				angleY = -90.0f;
@@ -406,18 +406,18 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 		free(rotationMatrix);
 	}
 
-	if(round(n.z, 6) != 0.0f)
-	{
-		if(round(n.y, 6) != 0.0f)
-		{
-			oppSideMag = n.z;
-			adySideMag = n.y;
+	oppSideMag = round(n.z, 6);
+	adySideMag = round(n.y, 6);
 
+	if(oppSideMag != 0.0f)
+	{
+		if(adySideMag != 0.0f)
+		{
 			angleX = atan2(oppSideMag, adySideMag)*180/PI;
 		}
 		else
 		{
-			if(n.z > 0.0f)
+			if(oppSideMag > 0.0f)
 				angleX = 90.0f;
 			else
 				angleX = -90.0f;
@@ -436,7 +436,7 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 
 	//Add both vectors and normalize
 
-	component = (6*component + surfNormal).getNormal();
+	component = (2*component + surfNormal).getNormal();
 }
 
 float round(float num, unsigned char decimals){
