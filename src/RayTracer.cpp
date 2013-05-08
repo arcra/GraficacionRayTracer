@@ -17,6 +17,8 @@ using namespace std;
 
 namespace RayTracing {
 
+unsigned int path = 0;
+
 RayTracer::RayTracer(int width, int height)
 {
 	this->width = width;
@@ -115,7 +117,11 @@ void RayTracer::renderScence()
 			surfNormal = surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point);
 			if(surfaces[surfaceIndex]->mat.bumpMap)
 				getNormalFromBumpMap(u, v, surfNormal, surfaces[surfaceIndex]->mat.bumpMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY, surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point));
+				//getTexturePixelToVector3D(u, v, surfNormal, surfaces[surfaceIndex]->mat.bumpMap, surfaces[surfaceIndex]->mat.sizeMapX, surfaces[surfaceIndex]->mat.sizeMapY);//XS, surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point));
 
+/*			rayBounceInfo.normal.x = surfNormal.x * surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point).x;
+			rayBounceInfo.normal.y = surfNormal.y * surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point).y;
+			rayBounceInfo.normal.z = surfNormal.z * surfaces[surfaceIndex]->computeNormal(rayBounceInfo.point).z;*/
 			rayBounceInfo.normal = surfNormal;
 			rayBounceInfo.mat = surfaces[surfaceIndex]->mat;
 			rayBounceInfo.surfaceIndex = surfaceIndex;
@@ -205,10 +211,39 @@ void RayTracer::renderScence()
 
 
 							lightCount++;
+						}else
+						{
+							if(rayBounceInfo.mat.textureMap)
+								{
+									surfaces[rayBounceInfo.surfaceIndex]->getTextureCoords(rayBounceInfo.point, u, v);
+									getTexturePixelToVector3D(u, v, diffuse, rayBounceInfo.mat.textureMap, rayBounceInfo.mat.sizeMapX, rayBounceInfo.mat.sizeMapY);
+									diffuse = 0.3 * diffuse;
+								}
+									else
+								{
+									lv = (lights[k].position - rayBounceInfo.point).normalize();
+
+									diffuseFactor = max(rayBounceInfo.normal.dotProduct(lv), 0.0f);
+									observerVec = (camera->position - rayBounceInfo.point).normalize();
+									h = 2*max(rayBounceInfo.normal.dotProduct(lv), 0.0f)*rayBounceInfo.normal - lv;
+									//matDiffuse = rayBounceInfo.mat.diffuse;
+									
+							
+									//diffuse = 0.3 * rayBounceInfo.mat.diffuse;//surfaces[path]->mat.diffuse; 
+									diffuse.x += lights[k].rgb.x*rayBounceInfo.mat.diffuse.x*diffuseFactor;
+									diffuse.y += lights[k].rgb.y*rayBounceInfo.mat.diffuse.y*diffuseFactor;
+									diffuse.z += lights[k].rgb.z*rayBounceInfo.mat.diffuse.z*diffuseFactor;
+									
+									specular.x += lights[k].rgb.x*rayBounceInfo.mat.specular.x*pow(max(observerVec.dotProduct(h), 0.0f), rayBounceInfo.mat.shininess);
+									specular.y += lights[k].rgb.y*rayBounceInfo.mat.specular.y*pow(max(observerVec.dotProduct(h), 0.0f), rayBounceInfo.mat.shininess);
+									specular.z += lights[k].rgb.z*rayBounceInfo.mat.specular.z*pow(max(observerVec.dotProduct(h), 0.0f), rayBounceInfo.mat.shininess);	
+								}
 						}
 					}
+
 					if(lightCount > 0)
 					{
+						
 						diffuse.x /= lightCount;
 						diffuse.y /= lightCount;
 						diffuse.z /= lightCount;
@@ -331,10 +366,13 @@ bool RayTracer::pathToLightIsClear(Vector3D point, Vector3D lightPosition)
 	float t;
 	for(l = 0; l < surfaces.size(); l++){
 		if( surfaces[l]->isSurfaceHit(pathRay,t)){
-			if(t < 1.0)
+			if(t < 1.0){
+				path = l;
 				return false;
+			}
 		}
 	}
+	
 	return true;
 }
 

@@ -332,6 +332,13 @@ void getNormalFromBumpMap(int u, int v, Vector3D& component, unsigned char *bump
 	else
 		v = v % sizeY;
 
+
+/*	unsigned int ind = (v * sizeX + u)*3;
+
+	component.x = bumpMap[ind]/255.0f;
+	component.y = bumpMap[ind+1]/255.0f;
+	component.z = bumpMap[ind+2]/255.0f;*/
+	
 	//Apply convolution and find gradient vector
 
 	char horizontalGradientMask[3][3] = {{-1, 0, 1},
